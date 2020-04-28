@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="rabbitmq的安装与使用，会详细介绍rabbitmq的五种模式，以及工作中会遇到的问题，如：延迟队列、消息重试、重复消费、消息丢失、顺序消费等。," />
 
 
 
@@ -79,13 +79,100 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="少年肩头">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="前言     消息队列(Message Queue，简称MQ)现在在很多公司都有使用，而MQ框架非常之多，比较流行的有RabbitMq、ActiveMq、ZeroMq、kafka，以及阿里开源的RocketMQ，巧了，我们公司使用的是RabbitMq，所以本文主要介绍一下RabbitMq（[捂脸]其实是我不会其他MQ，日后学了会再发的），主要从以下几点来讲： 1、RabbitMq的安装 2、Sp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RabbitMQ详解">
+<meta property="og:url" content="http://yoursite.com/2020/04/28/RabbitMQ%E8%AF%A6%E8%A7%A3/index.html">
 <meta property="og:site_name" content="少年肩头">
+<meta property="og:description" content="前言     消息队列(Message Queue，简称MQ)现在在很多公司都有使用，而MQ框架非常之多，比较流行的有RabbitMq、ActiveMq、ZeroMq、kafka，以及阿里开源的RocketMQ，巧了，我们公司使用的是RabbitMq，所以本文主要介绍一下RabbitMq（[捂脸]其实是我不会其他MQ，日后学了会再发的），主要从以下几点来讲： 1、RabbitMq的安装 2、Sp">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/8/17159db8e22c6f23?w=1021&h=514&f=png&s=299165">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/8/1715a51873ee648d">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/8/17159ff65b0ab2ec?w=2236&h=1236&f=png&s=224712">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/8/1715a070c9003b96?w=1638&h=1024&f=png&s=1046965">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/8/1715a260ee0bde3f?w=1134&h=714&f=png&s=518034">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/8/1715a309d9381810?w=1638&h=994&f=png&s=967061">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/8/1715a340d977421b?w=3524&h=1418&f=png&s=270688">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/8/1715a3adfe4be394?w=3580&h=1296&f=png&s=387650">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/8/1715a3d51f4b7421?w=2056&h=1314&f=png&s=169104">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/8/1715a44be06cc787?w=1850&h=1748&f=png&s=175351">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/8/1715a469a1fe44ce?w=2084&h=1282&f=png&s=157835">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/9/1715eebb52ce720a?w=1014&h=551&f=png&s=97505">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/9/1715ef4191f6ce90?w=634&h=404&f=png&s=33809">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/9/1715efddfabd64d9?w=949&h=367&f=png&s=45932">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/9/1715f5306ea0a482?w=1932&h=522&f=png&s=91486">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/9/1715f5598dd3fdb5?w=2636&h=198&f=png&s=124671">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/9/1715f5717f0702b2?w=1808&h=738&f=png&s=93414">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/9/1715f5d3f7db9091?w=3356&h=636&f=png&s=336057">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/9/1715f63bf2d87e97?w=375&h=165&f=png&s=18461">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/9/1715f774fdf41421?w=2476&h=726&f=png&s=220685">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/9/1715f77a7cc9858b?w=1738&h=696&f=png&s=161784">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/9/1715f86d47012a13?w=1096&h=652&f=png&s=81937">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/9/1715f87a8ccdfe82?w=1340&h=622&f=png&s=76593">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/9/1715f89729a689e6?w=1716&h=1090&f=png&s=251965">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/9/1715f8a48bf2b653?w=2052&h=626&f=png&s=207530">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/9/1715f8b5a02ac1c3?w=478&h=190&f=png&s=14537">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/13/171718c1486f59a9?w=1067&h=831&f=png&s=146714">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/13/171718ebe5b4cce6?w=783&h=339&f=png&s=50877">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/17167e86578fa14a?w=882&h=602&f=png&s=58162">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/10/171647947d66f4f2?w=1168&h=1124&f=png&s=137900">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/10/171647b496c028a4?w=1908&h=478&f=png&s=72390">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/17167e5a64e6d38f?w=1320&h=133&f=png&s=46243">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/17167e5e3d2d9f31?w=685&h=89&f=png&s=5471">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/17167eae9800307b?w=1109&h=327&f=png&s=79066">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/171681fd68e6505a?w=671&h=489&f=png&s=45219">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/13/171719912fff7d45?w=820&h=338&f=png&s=56285">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/13/1717199b3fd2ce2a?w=742&h=339&f=png&s=55681">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/1716841b457fd435?w=855&h=618&f=png&s=54896">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/1716842cdedc1203?w=1924&h=268&f=png&s=42474">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/17168435d0169584?w=1367&h=152&f=png&s=53082">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/1716843b9d8c3127?w=757&h=101&f=png&s=6926">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/171684467709149b?w=1932&h=288&f=png&s=43952">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/1716845ebeaa8578?w=1397&h=145&f=png&s=51673">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/17168465a8b29e9d?w=1006&h=158&f=png&s=3948">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/171684777b35d6f3?w=1087&h=107&f=png&s=15567">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/171686ae3908bc61?w=549&h=295&f=png&s=52074">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/17168479ab8366b1?w=1040&h=267&f=png&s=69803">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/13/171719c400870baf?w=773&h=349&f=png&s=57454">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/13/171719d99946425c?w=815&h=347&f=png&s=58176">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/1716870bcae58b4e?w=845&h=596&f=png&s=50036">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/17168711b5ae4faa?w=1926&h=250&f=png&s=41016">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/17168718a5090f21?w=1345&h=129&f=png&s=48518">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/1716871c94b7aab5?w=760&h=112&f=png&s=6913">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/1716873cbda6bd97?w=1930&h=282&f=png&s=44314">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/171687425021c5f0?w=1345&h=148&f=png&s=49312">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/17168746319283aa?w=1119&h=166&f=png&s=4505">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/17168abd0127a6f5?w=987&h=795&f=png&s=117175">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/17168ac009cbb9c8?w=958&h=658&f=png&s=100784">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/17168ad966e67126?w=1056&h=466&f=png&s=36098">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/17168adcb956f594?w=875&h=556&f=png&s=42866">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/17168b0251ebf635?w=1910&h=312&f=png&s=48066">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/17168b0e2f78ce6f?w=1346&h=211&f=png&s=80519">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/12/1716ca336fae5e9e?w=839&h=525&f=png&s=67754">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/13/17171a8df2d42feb?w=718&h=352&f=png&s=51446">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/12/1716ca3a15ae07db?w=936&h=400&f=png&s=70492">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/12/1716ca3f0186d593?w=419&h=274&f=png&s=26357">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/13/17171aac89448dec?w=784&h=509&f=png&s=91246">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/12/1716cb499490d255?w=979&h=386&f=png&s=73985">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/12/1716cb56873cdb95?w=1344&h=133&f=png&s=65949">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/12/1716d0a5bddc4b72?w=735&h=523&f=png&s=63330">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/12/1716d21521b76325?w=1044&h=805&f=png&s=126751">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/12/1716d0bde6e67f5e?w=1186&h=915&f=png&s=169954">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/12/1716d0cf043c196b?w=942&h=388&f=png&s=59120">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/12/1716d0e4cb75674e?w=1405&h=251&f=png&s=72402">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/13/17171afbdf8d933c?w=986&h=704&f=png&s=115516">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/12/1716c92a6abaf550?w=897&h=670&f=png&s=92535">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/12/1716c961c02c0a9b?w=1380&h=218&f=png&s=106308">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/12/1716c97e28f0425a?w=1475&h=279&f=png&s=104494">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/11/17168b84a1ed1f5b?w=675&h=588&f=png&s=202743">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/12/1716d22cb98cfb27?w=561&h=327&f=png&s=109217">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/12/1716d4e213332f33?w=1200&h=418&f=png&s=211004">
+<meta property="article:published_time" content="2020-04-28T08:27:00.000Z">
+<meta property="article:modified_time" content="2020-04-28T08:34:54.436Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="rabbitmq的安装与使用，会详细介绍rabbitmq的五种模式，以及工作中会遇到的问题，如：延迟队列、消息重试、重复消费、消息丢失、顺序消费等。">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://user-gold-cdn.xitu.io/2020/4/8/17159db8e22c6f23?w=1021&h=514&f=png&s=299165">
 
 
 
@@ -115,13 +202,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/"/>
+  <link rel="canonical" href="http://yoursite.com/2020/04/28/RabbitMQ详解/"/>
 
 
 
 
 
-  <title>少年肩头</title>
+  <title>RabbitMQ详解 | 少年肩头</title>
   
 
 
@@ -140,8 +227,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-  page-home">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <a href="https://github.com/weiwanx" target="_blank" rel="noopener" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
@@ -216,9 +302,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -248,9 +334,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/04/28/RabbitMQ%E8%AF%A6%E8%A7%A3/" itemprop="url">RabbitMQ详解</a></h1>
+          <h1 class="post-title" itemprop="name headline">RabbitMQ详解</h1>
         
 
         <div class="post-meta">
@@ -300,9 +384,7 @@
       
 
       
-        
-          
-            <p><img src="https://user-gold-cdn.xitu.io/2020/4/8/17159db8e22c6f23?w=1021&h=514&f=png&s=299165" alt=""></p>
+        <p><img src="https://user-gold-cdn.xitu.io/2020/4/8/17159db8e22c6f23?w=1021&h=514&f=png&s=299165" alt=""></p>
 <center><font color=DeepSkyBlue Size=5>前言</font></center>
 
 <hr>
@@ -638,8 +720,6 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">跑路跑路，有缘下篇文章再见，还没点赞的童鞋记得点个赞哈！</span><br></pre></td></tr></table></figure>
 
 
-          
-        
       
     </div>
     
@@ -654,146 +734,36 @@
 
     <footer class="post-footer">
       
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/28/hello-world/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="John Doe">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="少年肩头">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/04/28/hello-world/" itemprop="url">Hello World</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-04-28T14:23:01+08:00">
-                2020-04-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
+        <div class="post-tags">
           
-
+            <a href="/tags/rabbitmq%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E4%BD%BF%E7%94%A8%EF%BC%8C%E4%BC%9A%E8%AF%A6%E7%BB%86%E4%BB%8B%E7%BB%8Drabbitmq%E7%9A%84%E4%BA%94%E7%A7%8D%E6%A8%A1%E5%BC%8F%EF%BC%8C%E4%BB%A5%E5%8F%8A%E5%B7%A5%E4%BD%9C%E4%B8%AD%E4%BC%9A%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%8C%E5%A6%82%EF%BC%9A%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97%E3%80%81%E6%B6%88%E6%81%AF%E9%87%8D%E8%AF%95%E3%80%81%E9%87%8D%E5%A4%8D%E6%B6%88%E8%B4%B9%E3%80%81%E6%B6%88%E6%81%AF%E4%B8%A2%E5%A4%B1%E3%80%81%E9%A1%BA%E5%BA%8F%E6%B6%88%E8%B4%B9%E7%AD%89%E3%80%82/" rel="tag"># rabbitmq的安装与使用，会详细介绍rabbitmq的五种模式，以及工作中会遇到的问题，如：延迟队列、消息重试、重复消费、消息丢失、顺序消费等。</a>
           
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
         </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
       
 
       
       
-        <div class="post-eof"></div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/28/hello-world/" rel="next" title="Hello World">
+                <i class="fa fa-chevron-left"></i> Hello World
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
       
     </footer>
   </div>
@@ -803,10 +773,11 @@
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -814,6 +785,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -834,8 +809,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -886,6 +870,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Mac下RabbitMq的安装（windows安装点这里）"><span class="nav-number">1.</span> <span class="nav-text">Mac下RabbitMq的安装（windows安装点这里）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Homebrew"><span class="nav-number">1.1.</span> <span class="nav-text">安装Homebrew</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#注意事项"><span class="nav-number">1.1.1.</span> <span class="nav-text">注意事项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装RabbitMq"><span class="nav-number">1.2.</span> <span class="nav-text">安装RabbitMq</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动RabbitMq"><span class="nav-number">1.3.</span> <span class="nav-text">启动RabbitMq</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加用户及授权"><span class="nav-number">1.4.</span> <span class="nav-text">添加用户及授权</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#添加用户"><span class="nav-number">1.4.1.</span> <span class="nav-text">添加用户</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#授权"><span class="nav-number">1.4.2.</span> <span class="nav-text">授权</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SpringBoot项目中RabbitMq的使用"><span class="nav-number">2.</span> <span class="nav-text">SpringBoot项目中RabbitMq的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置项目"><span class="nav-number">2.1.</span> <span class="nav-text">配置项目</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#添加依赖"><span class="nav-number">2.1.1.</span> <span class="nav-text">添加依赖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改配置文件"><span class="nav-number">2.1.2.</span> <span class="nav-text">修改配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#项目下新建rabbit包，内容可直接复制粘贴过去"><span class="nav-number">2.1.3.</span> <span class="nav-text">项目下新建rabbit包，内容可直接复制粘贴过去</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实践"><span class="nav-number">2.2.</span> <span class="nav-text">实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、简单队列"><span class="nav-number">2.2.1.</span> <span class="nav-text">1、简单队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、Work模式"><span class="nav-number">2.2.2.</span> <span class="nav-text">2、Work模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、订阅模式"><span class="nav-number">2.2.3.</span> <span class="nav-text">3、订阅模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4、路由模式"><span class="nav-number">2.2.4.</span> <span class="nav-text">4、路由模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5、主题模式（通配符模式）"><span class="nav-number">2.2.5.</span> <span class="nav-text">5、主题模式（通配符模式）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#延迟队列"><span class="nav-number">3.</span> <span class="nav-text">延迟队列</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是延迟队列"><span class="nav-number">3.1.</span> <span class="nav-text">什么是延迟队列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#延迟队列的使用场景"><span class="nav-number">3.2.</span> <span class="nav-text">延迟队列的使用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现"><span class="nav-number">3.3.</span> <span class="nav-text">实现</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RabbitMq使用过程中遇到的问题及解决方案"><span class="nav-number">4.</span> <span class="nav-text">RabbitMq使用过程中遇到的问题及解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#消息重试机制"><span class="nav-number">4.1.</span> <span class="nav-text">消息重试机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重复消费"><span class="nav-number">4.2.</span> <span class="nav-text">重复消费</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息丢失"><span class="nav-number">4.3.</span> <span class="nav-text">消息丢失</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#顺序消费"><span class="nav-number">4.4.</span> <span class="nav-text">顺序消费</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -1019,6 +1019,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
