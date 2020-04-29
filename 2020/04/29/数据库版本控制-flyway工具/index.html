@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="flyway," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1在公司开发的时候会有很多人负责同一个服务，由于组内人员沟通不多，导致开发库和生产测试库内表的字段有差异或者不同，有些人删了字段或者新增了字段忘记告诉他人或者忘了上生产，这是很严重的问题，而flyway工具可以像Git管理不同人的代码那样，管理不同人的sql脚本，从而做到数据库同步。  正文 1falway的作用 1、用一种简单、干净的方案，帮助用户完成数据库迁移的工作。使用Flyway，用户可以">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据库版本控制--flyway工具">
+<meta property="og:url" content="http://yoursite.com/2020/04/29/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6-flyway%E5%B7%A5%E5%85%B7/index.html">
+<meta property="og:site_name" content="少年肩头">
+<meta property="og:description" content="1在公司开发的时候会有很多人负责同一个服务，由于组内人员沟通不多，导致开发库和生产测试库内表的字段有差异或者不同，有些人删了字段或者新增了字段忘记告诉他人或者忘了上生产，这是很严重的问题，而flyway工具可以像Git管理不同人的代码那样，管理不同人的sql脚本，从而做到数据库同步。  正文 1falway的作用 1、用一种简单、干净的方案，帮助用户完成数据库迁移的工作。使用Flyway，用户可以">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/3/28/1711f88b92bb17b1?w=284&h=117&f=png&s=22996">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/3/28/1711f94bb114d1cd?w=957&h=168&f=png&s=26823">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/3/28/1711fa3720d9e02d?w=778&h=128&f=png&s=12323">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/3/28/1711fa6523bd46bc?w=3526&h=1026&f=png&s=437583">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/3/28/1711fac9c8f268ce?w=3412&h=616&f=png&s=386014">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/3/28/1711fad912c5a80d?w=965&h=79&f=png&s=17718">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/3/28/1711fae67e4827de?w=1005&h=160&f=png&s=23258">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/3/28/1711fb406686c23d?w=2650&h=1092&f=png&s=222840">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/3/28/1711fb5685c25629?w=2686&h=618&f=png&s=322364">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/3/28/1711fbe02ac7f274?w=1864&h=252&f=png&s=54545">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/3/28/1711fbe98cd6edf7?w=1653&h=392&f=png&s=122044">
+<meta property="article:published_time" content="2020-04-29T05:41:55.000Z">
+<meta property="article:modified_time" content="2020-04-29T05:43:26.322Z">
+<meta property="article:author" content="wanxi">
+<meta property="article:tag" content="flyway">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://user-gold-cdn.xitu.io/2020/3/28/1711f88b92bb17b1?w=284&h=117&f=png&s=22996">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/04/29/数据库版本控制-flyway工具/"/>
+
+
+
+
+
+  <title>数据库版本控制--flyway工具 | 少年肩头</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/weiwanx" target="_blank" rel="noopener" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">少年肩头</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/29/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6-flyway%E5%B7%A5%E5%85%B7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wanxi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="少年肩头">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">数据库版本控制--flyway工具</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-29T13:41:55+08:00">
+                2020-04-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/" itemprop="url" rel="index">
+                    <span itemprop="name">中间件</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">在公司开发的时候会有很多人负责同一个服务，由于组内人员沟通不多，导致开发库和生产测试库内表的字段有差异或者不同，有些人删了字段或者新增了字段忘记告诉他人或者忘了上生产，这是很严重的问题，而flyway工具可以像Git管理不同人的代码那样，管理不同人的sql脚本，从而做到数据库同步。</span><br></pre></td></tr></table></figure>
+
+<p><strong>正文</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">falway的作用</span><br></pre></td></tr></table></figure>
+<p>1、用一种简单、干净的方案，帮助用户完成数据库迁移的工作。使用Flyway，用户可以从任意一个数据库版本迁移到最新版本，简单而且有效。<br/><br>2、避免直接操作数据库，在项目中写好相应的sql，falway会自动执行。<br/></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Flyway的工作模式</span><br></pre></td></tr></table></figure>
+<p>Flyway不限定脚本里面的内容，但是对脚本文件的名称有一定的要求，如下图：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/3/28/1711f88b92bb17b1?w=284&h=117&f=png&s=22996" alt=""><br>版本号可以使用小版本，如V1.1。</p>
+<p>具体要求：</p>
+<p>版本号和版本描述之间，使用两个下划线分隔。<br/><br>版本描述之间，使用一个下划线分隔单词。<br/><br>版本号唯一：不允许多个脚本文件有相同的版本号。<br/></p>
+<p>首次使用falway升级的时候，会在数据库新增一个表，名为：flyway_schema_history，如下图：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/3/28/1711f94bb114d1cd?w=957&h=168&f=png&s=26823" alt=""><br>这张表记录了每一次升级的记录，包括已经执行了哪些脚本，脚本的文件名，内容校验和，执行的时间和结果。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">使用Flyway的注意事项</span><br></pre></td></tr></table></figure>
+
+<p>flyway在升级数据库的时候，会检查已经执行过的版本对应的脚本是否发生变化，包括脚本文件名，以及脚本内容。如果flyway检测到发生了变化，则抛出错误，并终止升级，比如第一个人新增了一个字段，并且项目启动，falway执行了，而后一个人在前面这个人写的脚本上面有所改动，这样就会抛出错误，具体的看下面的演示。</p>
+<p>如果已经执行过的脚本没有发生变化，flyway会跳过这些脚本，依次执行后续版本的脚本，并在记录表中插入对应的升级记录。</p>
+<p>所以，flyway总是幂等的，而且可以支持跨版本的升级。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">springboot项目使用Flyway</span><br></pre></td></tr></table></figure>
+
+<p>1、添加依赖</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 数据库版本管理 --&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">	&lt;groupId&gt;org.flywaydb&lt;/groupId&gt;</span><br><span class="line">	&lt;artifactId&gt;flyway-core&lt;/artifactId&gt;</span><br><span class="line">	&lt;version&gt;5.2.4&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<p>2、配置文件新增配置信息</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 数据库版本控制</span></span><br><span class="line">spring:</span><br><span class="line">  flyway:</span><br><span class="line">    <span class="comment"># 启用或禁用 flyway</span></span><br><span class="line">    enabled: true</span><br><span class="line">    <span class="comment"># 字符编码</span></span><br><span class="line">    encoding: utf-8</span><br><span class="line">    <span class="comment"># 对执行迁移时基准版本的描述</span></span><br><span class="line">    baseline-description: test</span><br><span class="line">    <span class="comment"># 若连接的数据库非空库，是否初始化</span></span><br><span class="line">    <span class="comment"># 当迁移时发现目标schema非空，而且带有没有元数据的表时，是否自动执行基准迁移，默认false.</span></span><br><span class="line">    baseline-on-migrate: true</span><br><span class="line">    <span class="comment"># 指定 baseline 的版本号,缺省值为 1, 低于该版本号的 SQL 文件, migrate 的时候被忽略</span></span><br><span class="line">    <span class="comment"># 开始执行基准迁移时对现有的schema的版本打标签，默认值为1.</span></span><br><span class="line">    baseline-version: 0</span><br><span class="line">    <span class="comment"># 是否开启校验</span></span><br><span class="line">    <span class="comment"># 迁移时是否校验，默认为 true</span></span><br><span class="line">    validate-on-migrate: true</span><br><span class="line">    <span class="comment"># 默认脚本加载路径：/db/migration</span></span><br><span class="line">    <span class="comment"># locations: ["classpath:/db/migration"]</span></span><br><span class="line">    <span class="comment"># flyway 的 clean 命令会删除指定 schema 下的所有 table，默认 false</span></span><br><span class="line">    clean-disabled: false</span><br><span class="line">    <span class="comment"># 发环境最好开启 outOfOrder, 生产环境关闭 outOfOrder</span></span><br><span class="line">    <span class="comment"># 是否允许无序的迁移，默认 false</span></span><br><span class="line">    out-of-order: false</span><br><span class="line">    <span class="comment"># 检查迁移脚本的位置是否存在，默认false</span></span><br><span class="line">    <span class="keyword">check</span>-location: <span class="literal">false</span></span><br><span class="line">    <span class="comment"># 当读取元数据表时是否忽略错误的迁移，默认false</span></span><br><span class="line">    <span class="keyword">ignore</span>-future-migrations: <span class="literal">false</span></span><br><span class="line">    <span class="comment"># 当初始化好连接时要执行的SQL</span></span><br><span class="line">    init-sqls: <span class="keyword">show</span> <span class="keyword">tables</span>;</span><br><span class="line">    <span class="comment"># 迁移时使用的JDBC URL，如果没有指定的话，将使用配置的主数据源</span></span><br><span class="line">    <span class="comment">#url:</span></span><br><span class="line">    <span class="comment"># 迁移数据库的用户名</span></span><br><span class="line">    <span class="comment">#user:</span></span><br><span class="line">    <span class="comment"># 目标数据库的密码</span></span><br><span class="line">    <span class="comment">#password:</span></span><br><span class="line">    <span class="comment"># 设置每个placeholder的前缀，默认$&#123;</span></span><br><span class="line">    <span class="comment">#placeholder-prefix:</span></span><br><span class="line">    <span class="comment"># 是否要被替换，默认true</span></span><br><span class="line">    <span class="comment">#placeholder-replacement:</span></span><br><span class="line">    <span class="comment"># 设置每个placeholder的后缀，默认&#125;</span></span><br><span class="line">    <span class="comment">#placeholder-suffix:</span></span><br><span class="line">    <span class="comment"># 设置placeholder的value</span></span><br><span class="line">    <span class="comment">#placeholders.[placeholder name]</span></span><br><span class="line">    <span class="comment"># 设定需要flywary迁移的schema，大小写敏感，默认为连接默认的schema</span></span><br><span class="line">    <span class="comment">#schemas: flyway</span></span><br><span class="line">    <span class="comment"># 迁移文件的前缀，默认为V</span></span><br><span class="line">    <span class="comment">#sql-migration-prefix:</span></span><br><span class="line">    <span class="comment"># 迁移脚本的文件名分隔符，默认__</span></span><br><span class="line">    <span class="comment">#sql-migration-separator:</span></span><br><span class="line">    <span class="comment"># 迁移脚本的后缀，默认为.sql</span></span><br><span class="line">    <span class="comment">#sql-migration-suffix:</span></span><br><span class="line">    <span class="comment"># 使用的元数据表名，默认为schema_version</span></span><br><span class="line">    <span class="comment">#table: flyway_schema_history</span></span><br><span class="line">    <span class="comment"># 迁移时使用的目标版本，默认为latest version</span></span><br><span class="line">    <span class="comment">#target:</span></span><br></pre></td></tr></table></figure>
+
+<p>具体需要的配置看个人情况，需要用到哪些配置哪些就好</p>
+<p>3、新建flyway脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">这里要注意，flyway脚本默认放在classpath:&#x2F;db&#x2F;migration目录下面，如果想换位置，可以自定义一个位置，看上面的配置信息，里面spring.flyway.locations即为脚本存放的位置。</span><br></pre></td></tr></table></figure>
+<p>在db.migration包下新建V1__initialization_table.sql文件，命名一定要按flyway的规定来，要不然是无法识别的。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/3/28/1711fa3720d9e02d?w=778&h=128&f=png&s=12323" alt=""></p>
+<p>sql内的内容如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 非唯一索引必须按照“idx_字段名称_字段名称[_字段名]”进行命名</span></span><br><span class="line"><span class="comment">-- 唯一索引必须按照“uniq_字段名称_字段名称[_字段名]”进行命名</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> user_info;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`user_info`</span> (</span><br><span class="line">  <span class="string">`id`</span> <span class="built_in">bigint</span>(<span class="number">20</span>) <span class="keyword">unsigned</span> zerofill <span class="keyword">NOT</span> <span class="literal">NULL</span> AUTO_INCREMENT <span class="keyword">COMMENT</span> <span class="string">'自增ID'</span>,</span><br><span class="line">	<span class="string">`user_id_number`</span> <span class="built_in">varchar</span>(<span class="number">64</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'身份证号'</span>,</span><br><span class="line">  <span class="string">`user_name`</span> <span class="built_in">varchar</span>(<span class="number">64</span>) <span class="built_in">CHARACTER</span> <span class="keyword">SET</span> utf8mb4 <span class="keyword">COLLATE</span> utf8mb4_general_ci <span class="keyword">DEFAULT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'姓名'</span>,</span><br><span class="line">  <span class="string">`user_age`</span> <span class="built_in">int</span>(<span class="number">4</span>) <span class="keyword">DEFAULT</span> <span class="string">'1'</span> <span class="keyword">COMMENT</span> <span class="string">'年龄'</span>,</span><br><span class="line">  <span class="string">`user_color`</span> <span class="built_in">int</span>(<span class="number">6</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'颜色'</span>,</span><br><span class="line">  <span class="string">`user_gender`</span> datetime <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="keyword">CURRENT_TIMESTAMP</span> <span class="keyword">COMMENT</span> <span class="string">'性别'</span>,</span><br><span class="line">  <span class="string">`into_user`</span> <span class="built_in">varchar</span>(<span class="number">64</span>) <span class="built_in">CHARACTER</span> <span class="keyword">SET</span> utf8mb4 <span class="keyword">COLLATE</span> utf8mb4_general_ci <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`into_time`</span> datetime <span class="keyword">DEFAULT</span> <span class="keyword">CURRENT_TIMESTAMP</span> <span class="keyword">COMMENT</span> <span class="string">'创建时间'</span>,</span><br><span class="line">  <span class="string">`upd_user`</span> <span class="built_in">varchar</span>(<span class="number">64</span>) <span class="built_in">CHARACTER</span> <span class="keyword">SET</span> utf8mb4 <span class="keyword">COLLATE</span> utf8mb4_general_ci <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`upd_time`</span> datetime <span class="keyword">DEFAULT</span> <span class="keyword">CURRENT_TIMESTAMP</span> <span class="keyword">ON</span> <span class="keyword">UPDATE</span> <span class="keyword">CURRENT_TIMESTAMP</span> <span class="keyword">COMMENT</span> <span class="string">'更新时间'</span>,</span><br><span class="line">  <span class="string">`status`</span> <span class="built_in">int</span>(<span class="number">2</span>) <span class="keyword">DEFAULT</span> <span class="string">'1'</span> <span class="keyword">COMMENT</span> <span class="string">'软删除状态：默认：1 （-1：已删除  1：正常）'</span>,</span><br><span class="line">  <span class="string">`version`</span> <span class="built_in">int</span>(<span class="number">2</span>) <span class="keyword">DEFAULT</span> <span class="string">'1'</span> <span class="keyword">COMMENT</span> <span class="string">'版本号'</span>,</span><br><span class="line">  <span class="string">`remark`</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="built_in">CHARACTER</span> <span class="keyword">SET</span> utf8mb4 <span class="keyword">COLLATE</span> utf8mb4_general_ci <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>),</span><br><span class="line">  <span class="keyword">KEY</span> <span class="string">`idx_user_id_number`</span> (<span class="string">`user_id_number`</span>)</span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8mb4 <span class="keyword">COLLATE</span>=utf8mb4_general_ci ROW_FORMAT=DYNAMIC <span class="keyword">COMMENT</span>=<span class="string">'用户信息表'</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://user-gold-cdn.xitu.io/2020/3/28/1711fa6523bd46bc?w=3526&h=1026&f=png&s=437583" alt=""></p>
+<p>4、新增数据库信息配置</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># falwayTest为数据库名</span></span><br><span class="line">spring:</span><br><span class="line">  datasource:</span><br><span class="line">    url: jdbc:mysql://数据库地址:端口/falwayTest?useSSL=false&amp;allowMultiQueries=true</span><br><span class="line">    username: 用户名</span><br><span class="line">    password: 密码</span><br><span class="line">    driver-class-name: com.mysql.cj.jdbc.Driver</span><br></pre></td></tr></table></figure>
+
+<p>5、启动项目，会看到如下图所示:</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/3/28/1711fac9c8f268ce?w=3412&h=616&f=png&s=386014" alt=""></p>
+<p>6、去数据库查看：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/3/28/1711fad912c5a80d?w=965&h=79&f=png&s=17718" alt=""></p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/3/28/1711fae67e4827de?w=1005&h=160&f=png&s=23258" alt=""><br>成功新增表user_info</p>
+<p>7、给表user_info新增一个字段：user_money_amount：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/3/28/1711fb406686c23d?w=2650&h=1092&f=png&s=222840" alt=""></p>
+<p>8、重启项目并查看数据库：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/3/28/1711fb5685c25629?w=2686&h=618&f=png&s=322364" alt=""><br>刚才忘了字段排序了，重新加了一个sql文件，改下字段排序：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/3/28/1711fbe02ac7f274?w=1864&h=252&f=png&s=54545" alt=""></p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/3/28/1711fbe98cd6edf7?w=1653&h=392&f=png&s=122044" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">多个节点能够并行执行migration吗？</span><br></pre></td></tr></table></figure>
+<p>当然可以！Flyway使用数据库锁机制（locking technology of your database）来协调多个节点，从而保证多套应用程序可同时执行migration，而且集群控制也可做配置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">更多内容还得挖掘，以后各位挖掘出来了也可以写文章，加深自己的概念，也能让别人学习，给各位也给自己一个建议：做事规范，该写备注的就写备注，该注意顺序的就注意顺序，我刚进来公司也是代码不规范，数据库脚本不注意字段顺序等等，然后我老大跟我说：坏习惯要慢慢改掉，不要让习惯毁了你，以后你也有可能是别人的老大，这些事情你以后也要教他们，总不能到时候人家写的比你还规范，那你岂不是很尴尬。所以我现在也在改了，希望各位也能吸取一下经验，有则改之，无则加勉！</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/flyway/" rel="tag"># flyway</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/29/MYSQL%E7%9B%B8%E5%85%B3%E5%86%85%E5%AE%B9-%E5%BC%95%E6%93%8E%E3%80%81%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E3%80%81%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" rel="next" title="MYSQL相关内容(引擎、隔离级别、实现原理)">
+                <i class="fa fa-chevron-left"></i> MYSQL相关内容(引擎、隔离级别、实现原理)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="wanxi" />
+            
+              <p class="site-author-name" itemprop="name">wanxi</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/weiwanx" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/qq_35364594" target="_blank" title="csdn">
+                      
+                        <i class="fa fa-fw fa-crosshairs"></i>csdn</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://juejin.im/user/5ddbaddd6fb9a07aad3827a8/posts" target="_blank" title="掘金">
+                      
+                        <i class="fa fa-fw fa-spinner"></i>掘金</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="weiwanx@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wanxi</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
