@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="mysql," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言 前不久碰到了个mysql隔离级别相关的问题，后来就打算写一篇文章，记录一下mysql相关知识，以后复习也不用辛辛苦苦去找资料了，本文主要从以下几个方面来记录：  存储引擎 存储引擎是MySQL有别于其他数据库管理系统的最大特色，我们知道关系型数据库的数据是存在表里的，可以将表理解为由行和列组成的表格，类似于Excel的电子表格的形式，每个表格就是一个数据，表是在存储数据的同时，还要组织数据">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MYSQL相关内容(引擎、隔离级别、实现原理)">
+<meta property="og:url" content="http://yoursite.com/2020/04/29/MYSQL%E7%9B%B8%E5%85%B3%E5%86%85%E5%AE%B9-%E5%BC%95%E6%93%8E%E3%80%81%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E3%80%81%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:site_name" content="少年肩头">
+<meta property="og:description" content="前言 前不久碰到了个mysql隔离级别相关的问题，后来就打算写一篇文章，记录一下mysql相关知识，以后复习也不用辛辛苦苦去找资料了，本文主要从以下几个方面来记录：  存储引擎 存储引擎是MySQL有别于其他数据库管理系统的最大特色，我们知道关系型数据库的数据是存在表里的，可以将表理解为由行和列组成的表格，类似于Excel的电子表格的形式，每个表格就是一个数据，表是在存储数据的同时，还要组织数据">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/22/171a1094e344ddd4?w=800&h=320&f=png&s=140642">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a6b20cb65ed44?w=1380&h=1226&f=png&s=189023">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a5f461ff691d3?w=1713&h=527&f=png&s=1580402">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a5ff2d74d527f?w=1669&h=583&f=png&s=1461675">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a607ad226345f?w=1586&h=529&f=png&s=1016865">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a6517398ebc71?w=598&h=421&f=png&s=38410">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a5f461ff691d3?w=1713&h=527&f=png&s=1580402">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a657fd0998e5c?w=1551&h=484&f=png&s=615212">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a659c49310e29?w=1553&h=522&f=png&s=758376">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a65e2f13be892?w=598&h=225&f=png&s=23262">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a660e9469592a?w=1578&h=512&f=png&s=751221">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a66411af6450a?w=1709&h=653&f=png&s=1293799">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a659c49310e29?w=1553&h=522&f=png&s=758376">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a66dbd4b4a322?w=598&h=337&f=png&s=31161">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a66f65733ad3a?w=1555&h=473&f=png&s=578836">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a6722118a6644?w=1569&h=477&f=png&s=607692">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a6763437fb962?w=1699&h=669&f=png&s=1033792">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a6799f80fe93a?w=766&h=323&f=png&s=31617">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a67e1215ea0cb?w=1637&h=503&f=png&s=716838">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a67f315bd413f?w=1649&h=460&f=png&s=571166">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a66411af6450a?w=1709&h=653&f=png&s=1293799">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a75bc4f7072a2?w=2534&h=1428&f=png&s=320606">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a6722118a6644?w=1569&h=477&f=png&s=607692">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/4/23/171a7729e8e3917b?w=2280&h=1080&f=png&s=182561">
+<meta property="article:published_time" content="2020-04-29T02:13:22.000Z">
+<meta property="article:modified_time" content="2020-04-29T02:15:19.991Z">
+<meta property="article:author" content="wanxi">
+<meta property="article:tag" content="mysql">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://user-gold-cdn.xitu.io/2020/4/22/171a1094e344ddd4?w=800&h=320&f=png&s=140642">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/04/29/MYSQL相关内容-引擎、隔离级别、实现原理/"/>
+
+
+
+
+
+  <title>MYSQL相关内容(引擎、隔离级别、实现原理) | 少年肩头</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/weiwanx" target="_blank" rel="noopener" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">少年肩头</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/29/MYSQL%E7%9B%B8%E5%85%B3%E5%86%85%E5%AE%B9-%E5%BC%95%E6%93%8E%E3%80%81%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E3%80%81%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wanxi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="少年肩头">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MYSQL相关内容(引擎、隔离级别、实现原理)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-29T10:13:22+08:00">
+                2020-04-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index">
+                    <span itemprop="name">数据库</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://user-gold-cdn.xitu.io/2020/4/22/171a1094e344ddd4?w=800&h=320&f=png&s=140642" alt=""></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><hr>
+<p>前不久碰到了个mysql隔离级别相关的问题，后来就打算写一篇文章，记录一下mysql相关知识，以后复习也不用辛辛苦苦去找资料了，本文主要从以下几个方面来记录：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a6b20cb65ed44?w=1380&h=1226&f=png&s=189023" alt=""></p>
+<h1 id="存储引擎"><a href="#存储引擎" class="headerlink" title="存储引擎"></a>存储引擎</h1><hr>
+<p>存储引擎是MySQL有别于其他数据库管理系统的最大特色，我们知道关系型数据库的数据是存在表里的，可以将表理解为由行和列组成的表格，类似于Excel的电子表格的形式，每个表格就是一个数据，表是在存储数据的同时，还要组织数据的存储结构，而这些数据的组织结构就是由存储引擎决定的，即存储引擎的作用就是规定了数据存储时的存储结构。</p>
+<h2 id="存储引擎的优略势"><a href="#存储引擎的优略势" class="headerlink" title="存储引擎的优略势"></a>存储引擎的优略势</h2><p>在同个数据库中，我们可以为任何表指定存储引擎。例如，一个应用程序可能主要使用 InnoDB表，其中会有一个CSV 表用于将数据导出到电子表格，会有几个 MEMORY表用于临时工作区，这就需要了解各个存储引擎的优点和缺点，如下表格，详细的列出了常用搜索引擎支持与不支持的项（mysql最常用的存储引擎是InnoDB，毕竟只有它支持事务）：</p>
+<table>
+<thead>
+<tr>
+<th>特征</th>
+<th>MyISAM</th>
+<th>Memory</th>
+<th>InnoDB</th>
+<th>Archive</th>
+<th>NDB</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>B树索引</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>不支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>事务安全</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>不支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>备份/时间点恢复</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>集群数据库支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>聚集索引</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>不支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>压缩数据</td>
+<td>支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>资料快取</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>不支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>加密数据</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>外键支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>不支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>全文搜索索引</td>
+<td>支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>不支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>地理空间数据类型支持</td>
+<td>支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>地理空间索引支持</td>
+<td>支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>不支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>哈希索引</td>
+<td>不支持</td>
+<td>支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>索引缓存</td>
+<td>支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>不支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>锁定粒度</td>
+<td>表</td>
+<td>表</td>
+<td>行</td>
+<td>行</td>
+<td>行</td>
+</tr>
+<tr>
+<td>MVCC(多版本并发控制)</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>不支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>复制支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>储存限制</td>
+<td>256TB</td>
+<td>内存</td>
+<td>64TB</td>
+<td>无限制</td>
+<td>384EB</td>
+</tr>
+<tr>
+<td>T树索引</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>交易次数</td>
+<td>不支持</td>
+<td>不支持</td>
+<td>支持</td>
+<td>不支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>更新数据字典的统计信息</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+</tbody></table>
+<h2 id="MySQL-8-0支持的存储引擎"><a href="#MySQL-8-0支持的存储引擎" class="headerlink" title="MySQL 8.0支持的存储引擎"></a>MySQL 8.0支持的存储引擎</h2><h3 id="InnoDB"><a href="#InnoDB" class="headerlink" title="InnoDB"></a>InnoDB</h3><p>MySQL 8.0中的默认存储引擎。InnoDB是用于MySQL的事务安全（兼容ACID）的存储引擎，具有提交，回滚和崩溃恢复功能来保护用户数据。 InnoDB行级锁定（无需升级为更粗粒度的锁定）和Oracle风格的一致非锁定读取可提高多用户并发性和性能。InnoDB将用户数据存储在聚集索引中，以减少基于主键的常见查询的I / O。为了保持数据完整性， InnoDB还支持FOREIGN KEY引用完整性约束。</p>
+<h3 id="MyISAM"><a href="#MyISAM" class="headerlink" title="MyISAM"></a>MyISAM</h3><p>这些表占用的空间很小。 表级锁定限制了读/写工作负载中的性能，因此它通常用于Web和数据仓库配置中的只读或只读工作负载中。</p>
+<h3 id="Memory"><a href="#Memory" class="headerlink" title="Memory"></a>Memory</h3><p>将所有数据存储在RAM中，以便在需要快速查找非关键数据的环境中进行快速访问。该发动机以前称为HEAP发动机。它的用例正在减少；InnoDB借助其缓冲池存储区，它提供了一种通用且持久的方式来将大多数或所有数据保留在内存中，并 NDBCLUSTER为大型分布式数据集提供了快速的键值查找。</p>
+<h3 id="CSV"><a href="#CSV" class="headerlink" title="CSV"></a>CSV</h3><p>其表实际上是带有逗号分隔值的文本文件。CSV表允许您以CSV格式导入或转储数据，以与读取和写入相同格式的脚本和应用程序交换数据。由于CSV表未建立索引，因此通常InnoDB在正常操作期间将数据保留在表中，并且仅在导入或导出阶段使用CSV表。</p>
+<h3 id="Archive"><a href="#Archive" class="headerlink" title="Archive"></a>Archive</h3><p>这些紧凑的，未索引的表旨在用于存储和检索大量很少参考的历史，存档或安全审核信息。</p>
+<h3 id="Blackhole"><a href="#Blackhole" class="headerlink" title="Blackhole"></a>Blackhole</h3><p>Blackhole存储引擎可以接受但不存储数据，类似于Unix/dev/null设备。查询总是返回一个空集。这些表可用于将DML语句发送到从属服务器的复制配置中，但是主服务器不会保留其自己的数据副本。</p>
+<h3 id="NDB（也称为-NDBCLUSTER）"><a href="#NDB（也称为-NDBCLUSTER）" class="headerlink" title="NDB（也称为 NDBCLUSTER）"></a>NDB（也称为 NDBCLUSTER）</h3><p>此集群数据库引擎特别适合于需要尽可能高的正常运行时间和可用性的应用程序。</p>
+<h3 id="Merge"><a href="#Merge" class="headerlink" title="Merge"></a>Merge</h3><p>使MySQL DBA或开发人员可以在逻辑上对一系列相同的MyISAM表进行分组并将它们作为一个对象引用。适用于VLDB环境，例如数据仓库。</p>
+<h3 id="Federated"><a href="#Federated" class="headerlink" title="Federated"></a>Federated</h3><p>提供了链接单独的MySQL服务器以从许多物理服务器创建一个逻辑数据库的能力。非常适合于分布式或数据集市环境。</p>
+<h3 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h3><p>此引擎作为MySQL源代码中的示例，说明了如何开始编写新的存储引擎。它主要是开发人员感兴趣的。存储引擎是什么都不做的 “ 存根 ”。您可以使用此引擎创建表，但是不能将数据存储在表中或从表中检索数据。</p>
+<h2 id="存储引擎的设置与转换"><a href="#存储引擎的设置与转换" class="headerlink" title="存储引擎的设置与转换"></a>存储引擎的设置与转换</h2><h3 id="新建表指定存储引擎"><a href="#新建表指定存储引擎" class="headerlink" title="新建表指定存储引擎"></a>新建表指定存储引擎</h3><p>创建新表时，可以通过ENGINE在CREATE TABLE语句中添加表选项来 指定要使用的存储引擎（下述sql为新建一个存储引擎为MEMORY的用户表）：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`user`</span> (</span><br><span class="line">  <span class="string">`id`</span> <span class="built_in">bigint</span>(<span class="number">20</span>) <span class="keyword">unsigned</span> zerofill <span class="keyword">NOT</span> <span class="literal">NULL</span> AUTO_INCREMENT <span class="keyword">COMMENT</span> <span class="string">'自增ID'</span>,</span><br><span class="line">  <span class="string">`user_name`</span> <span class="built_in">varchar</span>(<span class="number">64</span>) <span class="built_in">CHARACTER</span> <span class="keyword">SET</span> utf8mb4 <span class="keyword">COLLATE</span> utf8mb4_general_ci <span class="keyword">DEFAULT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'姓名'</span>,</span><br><span class="line">  <span class="string">`into_user`</span> <span class="built_in">varchar</span>(<span class="number">64</span>) <span class="built_in">CHARACTER</span> <span class="keyword">SET</span> utf8mb4 <span class="keyword">COLLATE</span> utf8mb4_general_ci <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`into_time`</span> datetime <span class="keyword">DEFAULT</span> <span class="keyword">CURRENT_TIMESTAMP</span> <span class="keyword">COMMENT</span> <span class="string">'创建时间'</span>,</span><br><span class="line">  <span class="string">`upd_user`</span> <span class="built_in">varchar</span>(<span class="number">64</span>) <span class="built_in">CHARACTER</span> <span class="keyword">SET</span> utf8mb4 <span class="keyword">COLLATE</span> utf8mb4_general_ci <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`upd_time`</span> datetime <span class="keyword">DEFAULT</span> <span class="keyword">CURRENT_TIMESTAMP</span> <span class="keyword">ON</span> <span class="keyword">UPDATE</span> <span class="keyword">CURRENT_TIMESTAMP</span> <span class="keyword">COMMENT</span> <span class="string">'更新时间'</span>,</span><br><span class="line">  <span class="string">`status`</span> <span class="built_in">int</span>(<span class="number">2</span>) <span class="keyword">DEFAULT</span> <span class="string">'1'</span> <span class="keyword">COMMENT</span> <span class="string">'软删除状态：默认：1 （-1：已删除  1：正常）'</span>,</span><br><span class="line">  <span class="string">`version`</span> <span class="built_in">int</span>(<span class="number">2</span>) <span class="keyword">DEFAULT</span> <span class="string">'1'</span> <span class="keyword">COMMENT</span> <span class="string">'版本号'</span>,</span><br><span class="line">  <span class="string">`remark`</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="built_in">CHARACTER</span> <span class="keyword">SET</span> utf8mb4 <span class="keyword">COLLATE</span> utf8mb4_general_ci <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>),</span><br><span class="line">  <span class="keyword">KEY</span> <span class="string">`idx_user_name`</span> (<span class="string">`user_name`</span>)</span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">MEMORY</span> AUTO_INCREMENT=<span class="number">2</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8mb4 <span class="keyword">COLLATE</span>=utf8mb4_general_ci ROW_FORMAT=DYNAMIC <span class="keyword">COMMENT</span>=<span class="string">'用户表'</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="修改默认存储引擎"><a href="#修改默认存储引擎" class="headerlink" title="修改默认存储引擎"></a>修改默认存储引擎</h3><p>省略该ENGINE选项时，将使用默认存储引擎。在MySQL 8.0中默认引擎为InnoDB，可通过设置default_storage_engine变量来设置当前会话的默认存储引擎：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SET</span> default_storage_engine = NDBCLUSTER;</span><br></pre></td></tr></table></figure>
+
+<h3 id="存储引擎间转换"><a href="#存储引擎间转换" class="headerlink" title="存储引擎间转换"></a>存储引擎间转换</h3><p>要将表从一个存储引擎转换为另一个存储引擎，请使用ALTER TABLE指示新引擎的语句(user为表名)：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> <span class="string">`user`</span> <span class="keyword">ENGINE</span> = <span class="keyword">InnoDB</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Innodb-锁机制"><a href="#Innodb-锁机制" class="headerlink" title="Innodb 锁机制"></a>Innodb 锁机制</h2><p>锁是数据库系统区别于文件系统的一个关键特性，锁机制用于管理对共享资源的并发访问。不同数据库和不同搜索引擎都可能有不同的锁机制，MyISAM 引擎的锁是表锁设计，并发读没有问题，但是并发写入可能就存在一定的问题。InnoDB 存储引擎锁的实现和 Oracle 数据库非常类似，提供一致性的非锁定读和行级锁支持。行级锁没有相关额外的开销，可以同时得到并发性和一致性，InnoDB支持多种粒度锁定，允许行锁和表锁并存。</p>
+<h3 id="行锁"><a href="#行锁" class="headerlink" title="行锁"></a>行锁</h3><p>InnoDB实现标准的行级锁定，其中有两种类型的锁： 共享（S）锁和排他（X）锁。</p>
+<p>共享锁(S Lock) 允许事务读取一行数据<br/><br>排他锁(X Lock) 允许事务删除或者更新一行数据<br/></p>
+<p>如果一个事务T1已经获得了记录r上的共享锁，另一个事务T2也可以获得记录r上的共享锁，这种情况称为锁兼容。但如果T1获取的是记录r上的排他锁，则T2获取不了记录r上的共享锁，这种情况称为锁不兼容。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">注意: 共享锁和排他锁都是行锁，兼容指的是同一记录上的锁的兼容情况。</span><br></pre></td></tr></table></figure>
+
+<h3 id="表锁"><a href="#表锁" class="headerlink" title="表锁"></a>表锁</h3><p>InnoDB 额外支持的一种表级锁类型，意向锁(Intention Locks)，意向锁可以分为意向共享锁(Intention Shared Lock, IS)和意向排他锁(Intention eXclusive Lock, IX)。但它的锁定方式和共享锁和排他锁并不相同，意向锁上锁只是表示一种“意向”,并不会真的将对象锁住，让其他事物无法修改或访问，比如上面建的user表，假设我们的程序中有个事务T1想要修改表user中的行r1，它会上两个锁:</p>
+<p>1、给user表上意向排他锁<br/><br>2、给修改的行r1上排他锁<br/></p>
+<p>在此期间，其他的事务也还是可以访问user表，它上的锁只是表明一种意向，它只会将user表中的某几行记录添加一个排他锁。</p>
+<p>意向锁定协议如下：</p>
+<p>1、在事务可以获取表中某行的共享锁之前，它必须首先获取表中的意向共享锁或更高级别的锁。<br/><br>2、在事务可以获取表中某行的排它锁之前，它必须首先获取意向排他锁该表中的锁。<br/></p>
+<p>如果一个锁与现有锁兼容，则将其授予请求的事务，但如果与现有锁冲突，则不授予该锁。事务等待直到冲突的现有锁被释放。如果锁定请求与现有锁定发生冲突，并且由于可能导致死锁而无法被授予许可 ，则会发生错误。</p>
+<h3 id="其他锁"><a href="#其他锁" class="headerlink" title="其他锁"></a>其他锁</h3><p>InnoDB的锁机制还有</p>
+<p>1、记录锁：记录锁定是对索引记录的锁定。例如， SELECT c1 FROM t WHERE c1 = 10 FOR UPDATE; 可以防止从插入，更新或删除行，其中的值的任何其它交易t.c1是 10。<br/></p>
+<p>2、间隙锁：间隙锁定是对索引记录之间的间隙的锁定，或者是对第一个或最后一个索引记录之前的间隙的锁定。例如，SELECT c1 FROM t WHERE c1 BETWEEN 10 and 20 FOR UPDATE;防止其他事务将value 15插入column中t.c1，无论该列 中是否已有这样的值，因为该范围中所有现有值之间的间隙都是锁定的。<br/></p>
+<p>3、下一键锁：下一键锁定是索引记录上的记录锁定和索引记录之前的间隙上的间隙锁定的组合。InnoDB执行行级锁定，以使其在搜索或扫描表索引时对遇到的索引记录设置共享或排他锁。因此，行级锁实际上是索引记录锁。索引记录上的下一键锁定也会影响该索引记录之前的“ 间隙 ”。即，下一键锁定是索引记录锁定加上索引记录之前的间隙上的间隙锁定。如果一个会话R在索引中的记录上具有共享或排他锁 ，则另一会话不能R在索引顺序之前的间隙中插入新的索引记录 。<br/></p>
+<p>4、插入意图锁：插入意图锁定是一种通过INSERT行插入之前的操作设置的间隙锁定 。此锁发出插入意图的信号是，如果多个事务未插入间隙中的相同位置，则无需等待插入到同一索引间隙中的多个事务。假设有索引记录，其值分别为4和7。单独的事务分别尝试插入值5和6，在获得插入行的排他锁之前，每个事务都使用插入意图锁来锁定4和7之间的间隙，但不要互相阻塞，因为行是无冲突的。<br/></p>
+<p>5、自动上锁：一个AUTO-INC锁是通过交易将与表中取得一个特殊的表级锁 AUTO_INCREMENT列。在最简单的情况下，如果一个事务正在向表中插入值，则任何其他事务都必须等待自己在该表中进行插入，以便第一个事务插入的行接收连续的主键值。该innodb_autoinc_lock_mode 配置选项控制用于自动增加锁定的算法。它允许您选择如何在可预测的自动增量值序列与插入操作的最大并发性之间进行权衡。<br/></p>
+<p>在mysql官网有详细的资料，<a href="https://dev.mysql.com/doc/refman/8.0/en/innodb-locking.html#innodb-record-locks" target="_blank" rel="noopener">可以点击这里查看</a>。</p>
+<h1 id="事务相关问题"><a href="#事务相关问题" class="headerlink" title="事务相关问题"></a>事务相关问题</h1><hr>
+<h2 id="事务是什么"><a href="#事务是什么" class="headerlink" title="事务是什么"></a>事务是什么</h2><p>事务，由一个有限的数据库操作序列构成，这些操作要么全部执行,要么全部不执行，是一个不可分割的工作单位。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">如：张三想转100块钱给李四，那么就需要从张三的钱包扣除100，然后给李四的钱包加100，在这个过程中，如果张三扣钱没有出现异常，在李四加钱时出现异常，那么就要回滚操作，把扣了的钱还给张三，如果张三减钱和李四加钱都没有出现异常，那么才执行成功，而在这其中负责监视这些行为的，就是事务！</span><br></pre></td></tr></table></figure>
+
+<h2 id="事务的特性"><a href="#事务的特性" class="headerlink" title="事务的特性"></a>事务的特性</h2><p>事务的特性为：ACID</p>
+<p>原子性(Atomicity)： 事务作为一个整体被执行，包含在其中的对数据库的操作要么全部都执行，要么都不执行。<br/></p>
+<p>一致性(Consistency)： 指在事务开始之前和事务结束以后，数据不会被破坏，假如A账户给B账户转10块钱，不管成功与否，A和B的总金额是不变的。<br/></p>
+<p>隔离性(Isolation)： 多个事务并发访问时，事务之间是相互隔离的，一个事务不应该被其他事务干扰，多个并发事务之间要相互隔离。<br/></p>
+<p>持久性(Durability)： 表示事务完成提交后，该事务对数据库所作的操作更改，将持久地保存在数据库之中。<br/></p>
+<h2 id="事务并发产生的影响"><a href="#事务并发产生的影响" class="headerlink" title="事务并发产生的影响"></a>事务并发产生的影响</h2><p>我们先在数据库建个表，插入一条记录，然后通过测试来看可能会产生哪些影响。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 新建用户表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`user_info`</span> (</span><br><span class="line">  <span class="string">`id`</span> <span class="built_in">bigint</span>(<span class="number">20</span>) <span class="keyword">unsigned</span> zerofill <span class="keyword">NOT</span> <span class="literal">NULL</span> AUTO_INCREMENT <span class="keyword">COMMENT</span> <span class="string">'自增ID'</span>,</span><br><span class="line">  <span class="string">`user_name`</span> <span class="built_in">varchar</span>(<span class="number">64</span>) <span class="built_in">CHARACTER</span> <span class="keyword">SET</span> utf8mb4 <span class="keyword">COLLATE</span> utf8mb4_general_ci <span class="keyword">DEFAULT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'姓名'</span>,</span><br><span class="line">  <span class="string">`user_money_amount`</span> <span class="built_in">decimal</span>(<span class="number">15</span>,<span class="number">0</span>) <span class="keyword">DEFAULT</span> <span class="string">'0'</span> <span class="keyword">COMMENT</span> <span class="string">'用户金额汇总（分）'</span>,</span><br><span class="line">  PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>),</span><br><span class="line">  <span class="keyword">KEY</span> <span class="string">`idx_user_name`</span> (<span class="string">`user_name`</span>)</span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> AUTO_INCREMENT=<span class="number">2</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8mb4 <span class="keyword">COLLATE</span>=utf8mb4_general_ci ROW_FORMAT=DYNAMIC <span class="keyword">COMMENT</span>=<span class="string">'用户信息表'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 插入一条数据</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> user_info ( user_name, user_money_amount )</span><br><span class="line"><span class="keyword">VALUES</span></span><br><span class="line">	( <span class="string">'wx'</span>, <span class="number">2000</span> );</span><br></pre></td></tr></table></figure>
+
+<h3 id="脏读"><a href="#脏读" class="headerlink" title="脏读"></a>脏读</h3><p><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a5f461ff691d3?w=1713&h=527&f=png&s=1580402" alt=""></p>
+<p>事务A读到了事务B还没有提交的内容，就会产生脏读数据，现在右边修改了但是还没有提交事务，左边就已经读到了，如果右边后续发生了异常，这个修改是要回滚的，而左边读到的数据就是错的。</p>
+<h3 id="不可重复读"><a href="#不可重复读" class="headerlink" title="不可重复读"></a>不可重复读</h3><p><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a5ff2d74d527f?w=1669&h=583&f=png&s=1461675" alt=""></p>
+<p>事务B又干扰到了事务A，虽然这次事务B还没提交的内容事务A读不到，但是事务A在同一事务中读了三次，并且三次的结果还不一致，这就是不可重复读。</p>
+<h3 id="幻读"><a href="#幻读" class="headerlink" title="幻读"></a>幻读</h3><p><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a607ad226345f?w=1586&h=529&f=png&s=1016865" alt=""></p>
+<p>事务A查询一个范围的结果集，另一个并发事务B往这个范围中插入/删除了数据，并静悄悄地提交，然后事务A再次查询相同的范围，两次读取得到的结果集不一样了，这就是幻读。</p>
+<h2 id="隔离级别"><a href="#隔离级别" class="headerlink" title="隔离级别"></a>隔离级别</h2><h3 id="什么是隔离级别"><a href="#什么是隔离级别" class="headerlink" title="什么是隔离级别"></a>什么是隔离级别</h3><p>事务指定一个隔离级别,该隔离级别定义一个事务必须与由其他事务进行的资源或数据更改相隔离的程度。隔离级别从允许的并发副作用(例如,脏读或幻读)的角度进行描述。</p>
+<h3 id="查看系统级隔离级别和会话级隔离级别"><a href="#查看系统级隔离级别和会话级隔离级别" class="headerlink" title="查看系统级隔离级别和会话级隔离级别"></a>查看系统级隔离级别和会话级隔离级别</h3><p>想要查看本地系统和会话隔离级别的话，可以通过以下SQL查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> @@global.transaction_isolation,@@transaction_isolation;</span><br></pre></td></tr></table></figure>
+<p>修改SQL如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 修改系统级别</span></span><br><span class="line"><span class="keyword">set</span> <span class="keyword">global</span> transaction_isolation=<span class="string">'read-uncommitted'</span>;  </span><br><span class="line"><span class="comment">-- 修改会话级别</span></span><br><span class="line"><span class="keyword">set</span> transaction_isolation=<span class="string">'read-uncommitted'</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="隔离级别的类型"><a href="#隔离级别的类型" class="headerlink" title="隔离级别的类型"></a>隔离级别的类型</h3><h4 id="读未提交（Read-Uncommitted）"><a href="#读未提交（Read-Uncommitted）" class="headerlink" title="读未提交（Read Uncommitted）"></a>读未提交（Read Uncommitted）</h4><p>修改mysql会话级隔离级别为读未提交：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a6517398ebc71?w=598&h=421&f=png&s=38410" alt=""></p>
+<p>测试读未提交隔离级别会有什么问题：</p>
+<p>脏读：<br><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a5f461ff691d3?w=1713&h=527&f=png&s=1580402" alt=""></p>
+<p>不可重复读：<br><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a657fd0998e5c?w=1551&h=484&f=png&s=615212" alt=""></p>
+<p>幻读：<br><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a659c49310e29?w=1553&h=522&f=png&s=758376" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">由上面的图可以看出，读未提交隔离级别会出现脏读、不可重复读、幻读问题，读未提交隔离级别很少用于实际应用。</span><br></pre></td></tr></table></figure>
+
+<h4 id="读已提交（Read-Committed）"><a href="#读已提交（Read-Committed）" class="headerlink" title="读已提交（Read Committed）"></a>读已提交（Read Committed）</h4><p>修改mysql会话级隔离级别为读未提交：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a65e2f13be892?w=598&h=225&f=png&s=23262" alt=""></p>
+<p>测试读已提交隔离级别会有什么问题：</p>
+<p>脏读：<br><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a660e9469592a?w=1578&h=512&f=png&s=751221" alt=""></p>
+<p>不可重复读：<br><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a66411af6450a?w=1709&h=653&f=png&s=1293799" alt=""></p>
+<p>幻读：<br><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a659c49310e29?w=1553&h=522&f=png&s=758376" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">由上面的图可以看出，读已提交隔离级别会不出现脏读问题，但是会出现不可重复读、幻读问题。</span><br></pre></td></tr></table></figure>
+<h4 id="可重复读（Repeatable-Read）"><a href="#可重复读（Repeatable-Read）" class="headerlink" title="可重复读（Repeatable Read）"></a>可重复读（Repeatable Read）</h4><p>修改mysql会话级隔离级别为可重复读：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a66dbd4b4a322?w=598&h=337&f=png&s=31161" alt=""></p>
+<p>测试可重复读隔离级别会有什么问题：</p>
+<p>脏读：<br><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a66f65733ad3a?w=1555&h=473&f=png&s=578836" alt=""></p>
+<p>不可重复读：<br><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a6722118a6644?w=1569&h=477&f=png&s=607692" alt=""></p>
+<p>幻读：<br><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a6763437fb962?w=1699&h=669&f=png&s=1033792" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">由上面的图可以看出，读已提交隔离级别会不出现脏读和不可重复读问题，但是会出现幻读问题。读已提交隔离级别是mysql默认隔离级别，虽然会出现幻读情况，但实际开发中用的最多的隔离级别就是可重复读，具体原因你看了下面就知道了。</span><br></pre></td></tr></table></figure>
+
+<h4 id="串行化（Serializable）"><a href="#串行化（Serializable）" class="headerlink" title="串行化（Serializable）"></a>串行化（Serializable）</h4><p>修改mysql会话级隔离级别为串行化：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a6799f80fe93a?w=766&h=323&f=png&s=31617" alt=""><br>测试串行化隔离级别会有什么问题：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a67e1215ea0cb?w=1637&h=503&f=png&s=716838" alt=""></p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a67f315bd413f?w=1649&h=460&f=png&s=571166" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">由上面的图可以看出，当隔离级别设置为serializable的时候，不出现脏读、不可重复读和幻读问题，事务B对表的写操作，在等事务A的读操作。其实，这是隔离级别中最严格的，读写都不允许并发。它保证了最好的安全性，但是性能不是很好，这也是为什么读已提交是默认隔离级别并且实际使用最多的原因了。</span><br></pre></td></tr></table></figure>
+
+<h1 id="隔离级别的实现原理"><a href="#隔离级别的实现原理" class="headerlink" title="隔离级别的实现原理"></a>隔离级别的实现原理</h1><hr>
+<h2 id="读未提交（Read-Uncommitted）-1"><a href="#读未提交（Read-Uncommitted）-1" class="headerlink" title="读未提交（Read Uncommitted）"></a>读未提交（Read Uncommitted）</h2><p>读未提交隔离级别是最不常用的隔离级别，在读未提交隔离级别下：SELECT语句以非锁定方式执行，但是可能会使用行的早期版本。因此，使用此隔离级别，此类读取不一致。这也称为 脏读。否则，此隔离级别的工作方式类似于 读已提交（Read Committed）</p>
+<h2 id="读已提交（Read-Committed）-1"><a href="#读已提交（Read-Committed）-1" class="headerlink" title="读已提交（Read Committed）"></a>读已提交（Read Committed）</h2><p>使用READ COMMITTED隔离级别，事务中的每个一致读取都会设置并读取其自己的新快照。使用时FOR SHARE，将发生锁定读取，SELECT阻塞直到包含最新行的事务结束。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">快照读：就是select</span><br><span class="line"></span><br><span class="line">select * from table ....;</span><br><span class="line"></span><br><span class="line">当前读：特殊的读操作，插入&#x2F;更新&#x2F;删除操作，属于当前读，处理的都是当前的数据，需要加锁。</span><br><span class="line"></span><br><span class="line">select * from table where ? lock in share mode;</span><br><span class="line"></span><br><span class="line">select * from table where ? for update;</span><br><span class="line"></span><br><span class="line">insert;</span><br><span class="line"></span><br><span class="line">update ;</span><br><span class="line"></span><br><span class="line">delete;</span><br></pre></td></tr></table></figure>
+
+<p>因此，在读已提交的级别下，都会通过MVCC获取当前数据的最新快照，不加任何锁，也无视任何锁(因为历史数据是构造出来的，身上不可能有锁)。</p>
+<p>但是，该级别下还是遗留了不可重复读和幻读问题： MVCC版本的生成时机: 是每次select时。这就意味着，如果我们在事务A中执行多次的select，在每次select之间有其他事务更新了我们读取的数据并提交了，那就出现了不可重复读，即：重复读时，会出现数据不一致问题。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MVCC（ Multi-Version Concurrency Control ，多版本并发控制）指的就是在使用READ COMMITTD、REPEATABLE READ这两种隔离级别的事务在执行普通的SEELCT操作时访问记录的版本链的过程。可以使不同事务的读-写、写-读操作并发执行，从而提升系统性能。 READ COMMITTD、 REPEATABLE READ这两个隔离级别的一个很大不同就是：生成ReadView的时机不同， READCOMMITTD在每一次进行普通SELECT操作前都会生成一个ReadView，而REPEATABLE READ只在第一次进行普通SELECT操作前生成一个ReadView，之后的查询操作都重复使用这个ReadView就好了。</span><br></pre></td></tr></table></figure>
+
+<p>Read View：</p>
+<p>1、Read View就是事务执行快照读时，产生的读视图。<br/><br>2、事务执行快照读时，会生成数据库系统当前的一个快照，记录当前系统中还有哪些活跃的读写事务，把它们放到一个列表里。<br/><br>3、Read View主要是用来做可见性判断的，即判断当前事务可见哪个版本的数据<br/></p>
+<p>为了下面方便讨论Read View可见性规则，先定义几个变量：</p>
+<ol>
+<li>m_ids：表示在生成ReadView时当前系统中活跃的读写事务的事务id列表。</li>
+<li>min_trx_id：表示在生成ReadView时当前系统中活跃的读写事务中最小的事务id，也就是m_ids中的最小<br>值。</li>
+<li>max_trx_id：表示生成ReadView时系统中应该分配给下一个事务的id值。</li>
+<li>creator_trx_id：表示生成该ReadView的事务的事务id。</li>
+<li>trx_id：每次对某条记录进行改动时，都会把对应的事务id赋值给trx_id隐藏列。</li>
+</ol>
+<p>1）如果被访问版本的trx_id属性值与ReadView中的creator_trx_id值相同，意味着当前事务在访问它自<br>己修改过的记录，所以该版本可以被当前事务访问。<br/><br>2）如果被访问版本的trx_id属性值小于ReadView中的min_trx_id值，表明生成该版本的事务在当前事<br>务生成ReadView前已经提交，所以该版本可以被当前事务访问。<br/><br>3）如果被访问版本的trx_id属性值大于ReadView中的max_trx_id值，表明生成该版本的事务在当前事<br>务生成ReadView后才开启，所以该版本不可以被当前事务访问。<br/><br>4）如果被访问版本的trx_id属性值在ReadView的min_trx_id和max_trx_id之间，那就需要判断一下<br>trx_id属性值是不是在m_ids列表中，如果在，说明创建ReadView时生成该版本的事务还是活跃<br>的，该版本不可以被访问；如果不在，说明创建ReadView时生成该版本的事务已经被提交，该版<br>本可以被访问<br/></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">注意，可重复读跟读已提交隔离级别，最大的区别就是：读已提交每次读取数据前都生成一个ReadView，而可重复读只在第一次读取数据时生成一个ReadView。</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a66411af6450a?w=1709&h=653&f=png&s=1293799" alt=""></p>
+<p>如上图，在1操作我们将左边事务id定为1，右边事务id定为2，然后结合底下我画的图和上面的字，你看看，看不懂就多看几遍，就知道为啥读已提交会产生不可重复读问题了，如果各位觉得有问题请留言，我在看下。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a75bc4f7072a2?w=2534&h=1428&f=png&s=320606" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">很多人容易搞混不可重复读和幻读，确实这两者有些相似。但不可重复读重点在于update和delete，而幻读的重点在于insert。</span><br><span class="line"></span><br><span class="line">如果使用锁机制来实现这两种隔离级别，在可重复读中，该sql第一次读取到数据后，就将这些数据加锁，其它事务无法修改这些数据，就可以实现可重复读了。但这种方法却无法锁住insert的数据，所以当事务A先前读取了数据，或者修改了全部数据，事务B还是可以insert数据提交，这时事务A就会发现莫名其妙多了一条之前没有的数据，这就是幻读，不能通过行锁来避免。需要Serializable隔离级别 ，读用读锁，写用写锁，读锁和写锁互斥，这么做可以有效的避免幻读、不可重复读、脏读等问题，但会极大的降低数据库的并发能力。</span><br><span class="line"></span><br><span class="line">所以说不可重复读和幻读最大的区别，就在于如何通过锁机制来解决他们产生的问题。</span><br><span class="line"></span><br><span class="line">MySQL、ORACLE、PostgreSQL等成熟的数据库，出于性能考虑，都是使用了以乐观锁为理论基础的MVCC（多版本并发控制）来避免这两种问题。</span><br></pre></td></tr></table></figure>
+
+<h2 id="可重复读（Repeatable-Read）-1"><a href="#可重复读（Repeatable-Read）-1" class="headerlink" title="可重复读（Repeatable Read）"></a>可重复读（Repeatable Read）</h2><p>可重复读和读已提交最大的区别，就是生成ReadView的策略不一样，可重复读只在第一次读取数据时生成一个ReadView，而读已提交每次读取数据前都生成一个ReadView。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a6722118a6644?w=1569&h=477&f=png&s=607692" alt=""></p>
+<p>第一次select即创建ReadView，之后不会再发生变化，所以读到的还是原来的数据，即避免了不可重复读问题。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/4/23/171a7729e8e3917b?w=2280&h=1080&f=png&s=182561" alt=""></p>
+<h2 id="串行化（Serializable）-1"><a href="#串行化（Serializable）-1" class="headerlink" title="串行化（Serializable）"></a>串行化（Serializable）</h2><p>官方说法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">InnoDB implicitly converts all plain SELECT statements to SELECT ... FOR SHARE if autocommit is disabled. If autocommit is enabled, the SELECT is its own transaction. It therefore is known to be read only and can be serialized if performed as a consistent (nonlocking) read and need not block for other transactions. (To force a plain SELECT to block if other transactions have modified the selected rows, disable autocommit.)</span><br></pre></td></tr></table></figure>
+
+<p>所有SELECT语句会隐式转化为SELECT … FOR SHARE，即加共享锁。<br/><br>读加共享锁，写加排他锁，读写互斥。如果有未提交的事务正在修改某些行，所有select这些行的语句都会阻塞。<br/></p>
+<p>简单来说，在该隔离级别下，会自动将所有普通select转化为select … lock in share mode执行，即针对同一数据的所有读写都变成互斥的了，可靠性大大提高，并发性大大降低。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">这里要注意一个概念，不要认为select不会加锁，在Serializable隔离级别下，会自动将快照读（select * from table ....）转换为当前读（select * from table where ? lock in share mode），即自动加锁。</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="参考与感谢"><a href="#参考与感谢" class="headerlink" title="参考与感谢"></a>参考与感谢</h1><p><a href="https://juejin.im/post/5e800a1d6fb9a03c6568d06f#heading-11" target="_blank" rel="noopener">一文彻底读懂MySQL事务的四大隔离级别</a></p>
+<p><a href="https://dev.mysql.com/doc/refman/8.0/en/innodb-locking.html#innodb-record-locks" target="_blank" rel="noopener">MySQL 8.0参考手册</a></p>
+<p><a href="https://blog.csdn.net/nmjhehe/article/details/98470570" target="_blank" rel="noopener">mysql版本链和readView原理</a></p>
+<h1 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h1><hr>
+<p>这个图是我看上面几篇文章学习画的，我也不确定有没有问题，如果各位觉得有问题，可以提出来讨论一下，然后我在改正，谢谢各位！（既然看到这里了，点个赞不过分吧！）</p>
+<p>有缘下篇文章再见！</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mysql/" rel="tag"># mysql</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/28/RabbitMQ%E8%AF%A6%E8%A7%A3/" rel="next" title="RabbitMQ详解">
+                <i class="fa fa-chevron-left"></i> RabbitMQ详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="wanxi" />
+            
+              <p class="site-author-name" itemprop="name">wanxi</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/weiwanx" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/qq_35364594" target="_blank" title="csdn">
+                      
+                        <i class="fa fa-fw fa-crosshairs"></i>csdn</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://juejin.im/user/5ddbaddd6fb9a07aad3827a8/posts" target="_blank" title="掘金">
+                      
+                        <i class="fa fa-fw fa-spinner"></i>掘金</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="weiwanx@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#存储引擎"><span class="nav-number">2.</span> <span class="nav-text">存储引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#存储引擎的优略势"><span class="nav-number">2.1.</span> <span class="nav-text">存储引擎的优略势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL-8-0支持的存储引擎"><span class="nav-number">2.2.</span> <span class="nav-text">MySQL 8.0支持的存储引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#InnoDB"><span class="nav-number">2.2.1.</span> <span class="nav-text">InnoDB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MyISAM"><span class="nav-number">2.2.2.</span> <span class="nav-text">MyISAM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Memory"><span class="nav-number">2.2.3.</span> <span class="nav-text">Memory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CSV"><span class="nav-number">2.2.4.</span> <span class="nav-text">CSV</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Archive"><span class="nav-number">2.2.5.</span> <span class="nav-text">Archive</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Blackhole"><span class="nav-number">2.2.6.</span> <span class="nav-text">Blackhole</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NDB（也称为-NDBCLUSTER）"><span class="nav-number">2.2.7.</span> <span class="nav-text">NDB（也称为 NDBCLUSTER）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Merge"><span class="nav-number">2.2.8.</span> <span class="nav-text">Merge</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Federated"><span class="nav-number">2.2.9.</span> <span class="nav-text">Federated</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Example"><span class="nav-number">2.2.10.</span> <span class="nav-text">Example</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#存储引擎的设置与转换"><span class="nav-number">2.3.</span> <span class="nav-text">存储引擎的设置与转换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#新建表指定存储引擎"><span class="nav-number">2.3.1.</span> <span class="nav-text">新建表指定存储引擎</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改默认存储引擎"><span class="nav-number">2.3.2.</span> <span class="nav-text">修改默认存储引擎</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#存储引擎间转换"><span class="nav-number">2.3.3.</span> <span class="nav-text">存储引擎间转换</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Innodb-锁机制"><span class="nav-number">2.4.</span> <span class="nav-text">Innodb 锁机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#行锁"><span class="nav-number">2.4.1.</span> <span class="nav-text">行锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#表锁"><span class="nav-number">2.4.2.</span> <span class="nav-text">表锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他锁"><span class="nav-number">2.4.3.</span> <span class="nav-text">其他锁</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#事务相关问题"><span class="nav-number">3.</span> <span class="nav-text">事务相关问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#事务是什么"><span class="nav-number">3.1.</span> <span class="nav-text">事务是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#事务的特性"><span class="nav-number">3.2.</span> <span class="nav-text">事务的特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#事务并发产生的影响"><span class="nav-number">3.3.</span> <span class="nav-text">事务并发产生的影响</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#脏读"><span class="nav-number">3.3.1.</span> <span class="nav-text">脏读</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不可重复读"><span class="nav-number">3.3.2.</span> <span class="nav-text">不可重复读</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#幻读"><span class="nav-number">3.3.3.</span> <span class="nav-text">幻读</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#隔离级别"><span class="nav-number">3.4.</span> <span class="nav-text">隔离级别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是隔离级别"><span class="nav-number">3.4.1.</span> <span class="nav-text">什么是隔离级别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看系统级隔离级别和会话级隔离级别"><span class="nav-number">3.4.2.</span> <span class="nav-text">查看系统级隔离级别和会话级隔离级别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#隔离级别的类型"><span class="nav-number">3.4.3.</span> <span class="nav-text">隔离级别的类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#读未提交（Read-Uncommitted）"><span class="nav-number">3.4.3.1.</span> <span class="nav-text">读未提交（Read Uncommitted）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#读已提交（Read-Committed）"><span class="nav-number">3.4.3.2.</span> <span class="nav-text">读已提交（Read Committed）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#可重复读（Repeatable-Read）"><span class="nav-number">3.4.3.3.</span> <span class="nav-text">可重复读（Repeatable Read）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#串行化（Serializable）"><span class="nav-number">3.4.3.4.</span> <span class="nav-text">串行化（Serializable）</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#隔离级别的实现原理"><span class="nav-number">4.</span> <span class="nav-text">隔离级别的实现原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#读未提交（Read-Uncommitted）-1"><span class="nav-number">4.1.</span> <span class="nav-text">读未提交（Read Uncommitted）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读已提交（Read-Committed）-1"><span class="nav-number">4.2.</span> <span class="nav-text">读已提交（Read Committed）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可重复读（Repeatable-Read）-1"><span class="nav-number">4.3.</span> <span class="nav-text">可重复读（Repeatable Read）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#串行化（Serializable）-1"><span class="nav-number">4.4.</span> <span class="nav-text">串行化（Serializable）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考与感谢"><span class="nav-number">5.</span> <span class="nav-text">参考与感谢</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结尾"><span class="nav-number">6.</span> <span class="nav-text">结尾</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wanxi</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
