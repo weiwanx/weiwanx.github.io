@@ -250,7 +250,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/28/%E9%A1%B9%E7%9B%AE%E4%B8%AD%E6%9C%89%E7%94%A8%E8%BF%87%E9%94%81%E5%90%97%EF%BC%9F%E8%83%BD%E8%A7%A3%E9%87%8A%E4%B8%80%E4%B8%8B%E4%BB%80%E4%B9%88%E6%98%AFAQS-AbstractQueuedSynchronizer-%E5%90%97%EF%BC%9F/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/30/AQS-AbstractQueuedSynchronizer-%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="wanxi">
@@ -269,7 +269,163 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2020/05/28/%E9%A1%B9%E7%9B%AE%E4%B8%AD%E6%9C%89%E7%94%A8%E8%BF%87%E9%94%81%E5%90%97%EF%BC%9F%E8%83%BD%E8%A7%A3%E9%87%8A%E4%B8%80%E4%B8%8B%E4%BB%80%E4%B9%88%E6%98%AFAQS-AbstractQueuedSynchronizer-%E5%90%97%EF%BC%9F/" itemprop="url">项目中有用过锁吗？能解释一下什么是AQS(AbstractQueuedSynchronizer)吗？</a></h1>
+                <a class="post-title-link" href="/2020/05/30/AQS-AbstractQueuedSynchronizer-%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" itemprop="url">AQS(AbstractQueuedSynchronizer)的实现原理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-30T18:19:42+08:00">
+                2020-05-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          
+前言前一篇文章讲了一下AQS是什么以及AQS可重写的方法、提供的模板方法，本篇就从以下几点来写一下同步器的实现原理。
+
+同步队列
+独占式同步状态获取与释放
+共享式式同步状态获取与释放
+超时获取同步状态
+
+同步队列实现原理同步器依赖内部的同步队列(一个FIFO双向队列)来完成同步状态的管理，当前线程获取同步状态失败时，同步器会将当前线程以及等待状态等信息构建为一个节点(Node)并将其加入同步队列
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/05/30/AQS-AbstractQueuedSynchronizer-%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/28/%E9%A1%B9%E7%9B%AE%E4%B8%AD%E6%9C%89%E7%94%A8%E8%BF%87%E9%94%81%E5%90%97%EF%BC%9F%E8%83%BD%E8%A7%A3%E9%87%8A%E4%B8%80%E4%B8%8B%E4%BB%80%E4%B9%88%E6%98%AFAQS(AbstractQueuedSynchronizer)%E5%90%97%EF%BC%9F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wanxi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="少年肩头">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/05/28/%E9%A1%B9%E7%9B%AE%E4%B8%AD%E6%9C%89%E7%94%A8%E8%BF%87%E9%94%81%E5%90%97%EF%BC%9F%E8%83%BD%E8%A7%A3%E9%87%8A%E4%B8%80%E4%B8%8B%E4%BB%80%E4%B9%88%E6%98%AFAQS(AbstractQueuedSynchronizer)%E5%90%97%EF%BC%9F/" itemprop="url">项目中有用过锁吗？能解释一下什么是AQS(AbstractQueuedSynchronizer)吗？</a></h1>
         
 
         <div class="post-meta">
@@ -348,7 +504,7 @@
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2020/05/28/%E9%A1%B9%E7%9B%AE%E4%B8%AD%E6%9C%89%E7%94%A8%E8%BF%87%E9%94%81%E5%90%97%EF%BC%9F%E8%83%BD%E8%A7%A3%E9%87%8A%E4%B8%80%E4%B8%8B%E4%BB%80%E4%B9%88%E6%98%AFAQS-AbstractQueuedSynchronizer-%E5%90%97%EF%BC%9F/#more" rel="contents">
+            <a class="btn" href="/2020/05/28/%E9%A1%B9%E7%9B%AE%E4%B8%AD%E6%9C%89%E7%94%A8%E8%BF%87%E9%94%81%E5%90%97%EF%BC%9F%E8%83%BD%E8%A7%A3%E9%87%8A%E4%B8%80%E4%B8%8B%E4%BB%80%E4%B9%88%E6%98%AFAQS(AbstractQueuedSynchronizer)%E5%90%97%EF%BC%9F/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1603,159 +1759,6 @@ Java内存模型的设计有两个关键概念：
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/29/MYSQL%E7%9B%B8%E5%85%B3%E5%86%85%E5%AE%B9-%E5%BC%95%E6%93%8E%E3%80%81%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E3%80%81%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="wanxi">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="少年肩头">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/04/29/MYSQL%E7%9B%B8%E5%85%B3%E5%86%85%E5%AE%B9-%E5%BC%95%E6%93%8E%E3%80%81%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E3%80%81%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" itemprop="url">MYSQL相关内容(引擎、隔离级别、实现原理)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-29T10:13:22+08:00">
-                2020-04-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index">
-                    <span itemprop="name">数据库</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          
-前言
-前不久碰到了个mysql隔离级别相关的问题，后来就打算写一篇文章，记录一下mysql相关知识，以后复习也不用辛辛苦苦去找资料了，本文主要从以下几个方面来记录：
-
-存储引擎
-存储引擎是MySQL有别于其他数据库管理系统的最大特色，我们知道关系型数据库的数据是存在表里的，可以将表理解为由行和列组成的表格，类似于Excel的电子表格的形式，每个表格就是一个数据，表是在存储数据的同时，还要组织数据
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2020/04/29/MYSQL%E7%9B%B8%E5%85%B3%E5%86%85%E5%AE%B9-%E5%BC%95%E6%93%8E%E3%80%81%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E3%80%81%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1810,7 +1813,7 @@ Java内存模型的设计有两个关键概念：
               
                 <a href="/archives/%7C%7C%20archive">
               
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">12</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

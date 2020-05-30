@@ -82,7 +82,7 @@
 <meta name="description" content="1 前言锁是用来控制多个线程访问共享资源的方式，一般来说，一个锁能防止多个线程同时访问共享资源(但是有些锁可以允许多个线程并发的访问共享资源，如读写锁)。在以前，Java程序是靠synchronized来实现锁功能的，而在Java SE 5之后，并发包中新增了Lock接口(以及相关实现类)用来实现锁功能，他提供了与synchronized关键字类似的同步功能，只是在使用时需要显式的获取锁和释放锁">
 <meta property="og:type" content="article">
 <meta property="og:title" content="项目中有用过锁吗？能解释一下什么是AQS(AbstractQueuedSynchronizer)吗？">
-<meta property="og:url" content="http://yoursite.com/2020/05/28/%E9%A1%B9%E7%9B%AE%E4%B8%AD%E6%9C%89%E7%94%A8%E8%BF%87%E9%94%81%E5%90%97%EF%BC%9F%E8%83%BD%E8%A7%A3%E9%87%8A%E4%B8%80%E4%B8%8B%E4%BB%80%E4%B9%88%E6%98%AFAQS-AbstractQueuedSynchronizer-%E5%90%97%EF%BC%9F/index.html">
+<meta property="og:url" content="http://yoursite.com/2020/05/28/%E9%A1%B9%E7%9B%AE%E4%B8%AD%E6%9C%89%E7%94%A8%E8%BF%87%E9%94%81%E5%90%97%EF%BC%9F%E8%83%BD%E8%A7%A3%E9%87%8A%E4%B8%80%E4%B8%8B%E4%BB%80%E4%B9%88%E6%98%AFAQS(AbstractQueuedSynchronizer)%E5%90%97%EF%BC%9F/index.html">
 <meta property="og:site_name" content="少年肩头">
 <meta property="og:description" content="1 前言锁是用来控制多个线程访问共享资源的方式，一般来说，一个锁能防止多个线程同时访问共享资源(但是有些锁可以允许多个线程并发的访问共享资源，如读写锁)。在以前，Java程序是靠synchronized来实现锁功能的，而在Java SE 5之后，并发包中新增了Lock接口(以及相关实现类)用来实现锁功能，他提供了与synchronized关键字类似的同步功能，只是在使用时需要显式的获取锁和释放锁">
 <meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/03e11dd8-beb6-4c9c-bd45-1ac3c39bb490.png">
@@ -125,7 +125,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2020/05/28/项目中有用过锁吗？能解释一下什么是AQS-AbstractQueuedSynchronizer-吗？/"/>
+  <link rel="canonical" href="http://yoursite.com/2020/05/28/项目中有用过锁吗？能解释一下什么是AQS(AbstractQueuedSynchronizer)吗？/"/>
 
 
 
@@ -260,7 +260,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/28/%E9%A1%B9%E7%9B%AE%E4%B8%AD%E6%9C%89%E7%94%A8%E8%BF%87%E9%94%81%E5%90%97%EF%BC%9F%E8%83%BD%E8%A7%A3%E9%87%8A%E4%B8%80%E4%B8%8B%E4%BB%80%E4%B9%88%E6%98%AFAQS-AbstractQueuedSynchronizer-%E5%90%97%EF%BC%9F/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/28/%E9%A1%B9%E7%9B%AE%E4%B8%AD%E6%9C%89%E7%94%A8%E8%BF%87%E9%94%81%E5%90%97%EF%BC%9F%E8%83%BD%E8%A7%A3%E9%87%8A%E4%B8%80%E4%B8%8B%E4%BB%80%E4%B9%88%E6%98%AFAQS(AbstractQueuedSynchronizer)%E5%90%97%EF%BC%9F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="wanxi">
@@ -476,6 +476,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2020/05/30/AQS-AbstractQueuedSynchronizer-%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" rel="prev" title="AQS(AbstractQueuedSynchronizer)的实现原理">
+                AQS(AbstractQueuedSynchronizer)的实现原理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -555,7 +559,7 @@
               
                 <a href="/archives/%7C%7C%20archive">
               
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">12</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
