@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="并发艺术," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言前几章都在讲一些锁的使用和原理，主要是为了保证多线程情况下变量的原子性，但这并不是说多线程不好，合理利用还是有好处的。至于什么好处，看下面内容就懂了，先打个比方吧(谁叫比方，上来挨打)：假如你体育考试，要跑1000米，你现在有两个选择：  一个人跑完1000米。 找三个人陪你一起跑，每个人跑250米就好  两种方案你选哪个？ 今天写一下面试必问的内容:多线程与线程池。主要从以下几方面来说:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="面试必问：多线程与线程池">
+<meta property="og:url" content="http://yoursite.com/2020/06/07/%E9%9D%A2%E8%AF%95%E5%BF%85%E9%97%AE%EF%BC%9A%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0/index.html">
+<meta property="og:site_name" content="少年肩头">
+<meta property="og:description" content="前言前几章都在讲一些锁的使用和原理，主要是为了保证多线程情况下变量的原子性，但这并不是说多线程不好，合理利用还是有好处的。至于什么好处，看下面内容就懂了，先打个比方吧(谁叫比方，上来挨打)：假如你体育考试，要跑1000米，你现在有两个选择：  一个人跑完1000米。 找三个人陪你一起跑，每个人跑250米就好  两种方案你选哪个？ 今天写一下面试必问的内容:多线程与线程池。主要从以下几方面来说:">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/8c91e73f-67b6-4077-84b7-86f5711cd24d.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/365216c8-668e-47b9-8714-5fb68f3be733.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/ea9bb5dc-165b-4e7c-b0e3-6b29082f4cf8.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/97f05d53-c1b5-4e79-a4e7-0fa3847343da.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/e5ece0cd-d84b-4da8-a3c3-72ea29f18558.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/8baa8ff2-0ec9-46b0-9388-a902633fd8f1.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/38993e32-2eaf-4f27-876c-224b7325d311.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/cdfe30bd-5334-4eed-b240-b9a4a5f38b95.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/359ce9b4-24aa-406a-98f8-58ff2dfa76bf.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/7b23e2c1-ef73-4374-8f0a-12624ac92d84.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/81d4b6c9-c164-4d21-92d5-16c4cd3059ff.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/f3e4129e-e180-4414-be9c-25be9b8ea773.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/cc974047-4b7b-4ac7-a369-84884b4c84ce.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/3684277c-7dd4-4418-88a5-6d71ea7d79b5.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/8e2fc421-3a92-4d2b-bff3-c696f3473bf9.png">
+<meta property="article:published_time" content="2020-06-07T12:50:17.000Z">
+<meta property="article:modified_time" content="2020-06-07T12:51:24.780Z">
+<meta property="article:author" content="wanxi">
+<meta property="article:tag" content="并发艺术">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://imgkr.cn-bj.ufileos.com/8c91e73f-67b6-4077-84b7-86f5711cd24d.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/06/07/面试必问：多线程与线程池/"/>
+
+
+
+
+
+  <title>面试必问：多线程与线程池 | 少年肩头</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/weiwanx" target="_blank" rel="noopener" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">少年肩头</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/07/%E9%9D%A2%E8%AF%95%E5%BF%85%E9%97%AE%EF%BC%9A%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wanxi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="少年肩头">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">面试必问：多线程与线程池</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-07T20:50:17+08:00">
+                2020-06-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://imgkr.cn-bj.ufileos.com/8c91e73f-67b6-4077-84b7-86f5711cd24d.png" alt="img"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a><strong>前言</strong></h2><p>前几章都在讲一些锁的使用和原理，主要是为了保证多线程情况下变量的原子性，<code>但这并不是说多线程不好</code>，合理利用还是有好处的。至于什么好处，看下面内容就懂了，先打个比方吧(<code>谁叫比方，上来挨打</code>)：假如你体育考试，要跑1000米，你现在有两个选择：</p>
+<ul>
+<li>一个人跑完1000米。</li>
+<li>找三个人陪你一起跑，每个人跑250米就好</li>
+</ul>
+<p>两种方案你选哪个？</p>
+<p>今天写一下面试必问的内容:多线程与线程池。主要从以下几方面来说:</p>
+<ul>
+<li>什么是线程(什么是多线程)</li>
+<li>线程状态</li>
+<li>多线程的优点和弊端</li>
+<li>线程池的好处</li>
+<li>线程池的新建</li>
+<li>线程池状态</li>
+<li>线程池执行任务</li>
+<li>线程池异常处理</li>
+<li>为什么submit()方法提交任务产生异常会被”吞掉”</li>
+</ul>
+<p>6月6日，好吉利的数字，祝大家六六大顺，话不多说，开始搞事！</p>
+<h2 id="1、什么是线程-什么是多线程"><a href="#1、什么是线程-什么是多线程" class="headerlink" title="1、什么是线程(什么是多线程)"></a><strong>1、什么是线程(什么是多线程)</strong></h2><blockquote>
+<p>在这里先说一下进程，什么是进程：昨晚我打开的久违的wegame，登录了英雄联盟客户端，而这个客户端，就是一个进程，客户端进程名是Client.exe，不信你们试试！</p>
+</blockquote>
+<p>线程是操作系统调度的最小单元，每个线程都拥有各自的计数器、堆栈和局部变量等属性，并且能够访问共享的内存变量。而多个线程组成了一个进程。一个程序，比如爱奇艺客户端、腾讯客户端、wegam等，至少有一个进程，而一个进程至少有一个线程。</p>
+<p>那么问题来了，<code>通过一个main方法启动一个Java程序</code>，这算是进程还是线程呢？代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public class ThreadTest &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>答案是：<code>进程</code>，改进一下上述代码，执行如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public class ThreadTest &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; 获取Java线程管理的MXBean</span><br><span class="line">        ThreadMXBean threadMXBean &#x3D; ManagementFactory.getThreadMXBean();</span><br><span class="line">        &#x2F;&#x2F; dumpAllThreads(boolean lockedMonitors, boolean lockedSynchronizers)</span><br><span class="line">        &#x2F;&#x2F; 不需要获取同步的synchronizer信息，仅获取线程和线程堆栈晋西</span><br><span class="line">        ThreadInfo[] threadInfos &#x3D; threadMXBean.dumpAllThreads(true, false);</span><br><span class="line">        for (ThreadInfo threadInfo : threadInfos)&#123;</span><br><span class="line">            System.out.println(</span><br><span class="line">                    &quot;[&quot; + threadInfo.getThreadId() + &quot;]&quot; + threadInfo.getThreadName()</span><br><span class="line">            );</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://imgkr.cn-bj.ufileos.com/365216c8-668e-47b9-8714-5fb68f3be733.png" alt="img"></p>
+<ul>
+<li>main:main线程，程序入口</li>
+<li>Reference Handler:清除Reference的线程(对象的引用存在虚拟机栈中，GC的时候需要用到)</li>
+<li>Finalizer:调用对象finalizer方法的线程(GC的时候需要用到)</li>
+<li>Signal Dispatcher:分发处理发送给JVM信号的线程</li>
+<li>Monitor Ctrl-Break:同步的monitor线程</li>
+</ul>
+<p>看上面例子，能清楚的看到，一个Java程序的运行不仅是main()方法的运行，而是main线程和多个其他的线程同时运行，这就是多线程。</p>
+<p>多线程：<code>多线程就是指一个进程中同时有多个执行路径（线程）正在执行</code>。</p>
+<h2 id="2、线程状态"><a href="#2、线程状态" class="headerlink" title="2、线程状态"></a><strong>2、线程状态</strong></h2><p>Java线程在运行的生命周期中可能处于下表所示的6种不同状态，在给定的一个时刻，线程只能处于其中一个状态。</p>
+<table>
+<thead>
+<tr>
+<th align="left">状态名称</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">NEW</td>
+<td align="center">初始状态，线程被构建，但是还没有调用start()方法</td>
+</tr>
+<tr>
+<td align="left">RUNNABLE</td>
+<td align="center">运行状态，Java线程将操作系统中的就绪和运行两种状态笼统的成为“运行中”</td>
+</tr>
+<tr>
+<td align="left">BLOCKED</td>
+<td align="center">阻塞状态，表示线程阻塞于锁(这里有个容易混淆的问题，下面会讲)</td>
+</tr>
+<tr>
+<td align="left">WAITING</td>
+<td align="center">等待状态，表示线程进入等待状态，进入该状态表示当前线程需要等待其他线程做出一些特定动作(通知或中断，想下前几篇文章，进入同步队列获取锁的过程，想想有什么问题)</td>
+</tr>
+<tr>
+<td align="left">TIME_WAITING</td>
+<td align="center">超时等待状态，该状态不同于WAITING，它是可以在指定的时间自行返回的</td>
+</tr>
+<tr>
+<td align="left">TERMINATED</td>
+<td align="center">终止状态，表示当前线程已经执行完毕</td>
+</tr>
+</tbody></table>
+<p>注意，在上一篇讲ReentrantLock(重入锁)的时候，当已经有线程获取了，其余线程会进入同步队列，尝试自旋几次之后调用LockSupport.park()方法，这个方法是用来阻塞当前线程，那么在调用了这个方法之后，在同步队列中线程的状态是什么呢？BLOCKED还是WAITING？答案是线程处于<code>WAITING(等待状态)</code>，阻塞状态是线程阻塞在进入synchronized关键字修饰的方法或代码块时的状态，但是阻塞在Lock接口的线程状态是等待状态。</p>
+<p>线程在自身的生命周期中状态变迁图如下所示：</p>
+<p><img src="https://imgkr.cn-bj.ufileos.com/ea9bb5dc-165b-4e7c-b0e3-6b29082f4cf8.png" alt="img"></p>
+<h2 id="3、多线程的优点和弊端"><a href="#3、多线程的优点和弊端" class="headerlink" title="3、多线程的优点和弊端"></a><strong>3、多线程的优点和弊端</strong></h2><h3 id="3-1-优点"><a href="#3-1-优点" class="headerlink" title="3.1 优点"></a>3.1 优点</h3><ul>
+<li>多线程技术使程序的响应速度更快(<code>比如打开一个网页，调用一个接口，这个接口创建了很多线程去数据库读取数据异步去返回数据，这样用户立马就打开了网页，里面的内容的展现可能不是一起展示，但是总比空白界面停留十几秒再全部展示出来好吧</code>);</li>
+<li>当前没有进行处理的任务时可以将处理器时间让给其它任务;</li>
+<li>占用大量处理时间的任务可以定期将处理器时间让给其它任务;</li>
+<li>可以随时停止任务(<code>中断某个线程</code>);</li>
+<li>可以分别设置各个任务的优先级以优化性能(<code>在线程构建的时候通过setPriority(int)方法来修改优先级，范围为1-10，默认优先级为5，优先级高的线程分配时间片的数量要多于优先级低的线程</code>)。</li>
+</ul>
+<p>一个线程在一个时刻只能运行在一个处理器核心上，使用多线程技术，将计算逻辑分配到多个处理器核心上，就会显著减少程序的处理时间，变得更有效率：</p>
+<p><img src="https://imgkr.cn-bj.ufileos.com/97f05d53-c1b5-4e79-a4e7-0fa3847343da.png" alt="img"></p>
+<h3 id="3-2-弊端"><a href="#3-2-弊端" class="headerlink" title="3.2 弊端"></a>3.2 弊端</h3><ul>
+<li>等候使用共享资源时造成程序的运行速度变慢(<code>比如库存，如果多个线程同时去扣减，就有可能变成负数，这样是不被允许的，所以就需要之前几篇文章讲的锁来控制，所以前一个线程获取了资源，后一个线程就会被阻塞，造成程序的运行速度变慢</code>)。</li>
+<li>对线程进行管理要求额外的CPU开销，线程的使用会给系统带来上下文切换的额外负担(<code>多线程是通过分配CPU时间片来实现的，时间片非常短，所以CPU会不停的切换线程执行，当一个线程执行一个时间片后会切到下一个任务，但是在切换之前会保存上一个任务的状态，下次在切换回这个任务的时候，可以再加载这个任务的状态，这就是上下文切换</code>)。</li>
+<li>线程的死锁。即对共享资源加锁实现同步的过程中可能会死锁。</li>
+<li>对公有变量的同时读或写，可能对造成脏读等(<code>这就是锁该做的事情</code>)。</li>
+<li>线程创建和销毁会造成消耗(<code>这就是线程池该做的事情了</code>)。</li>
+</ul>
+<h2 id="4、线程池的好处"><a href="#4、线程池的好处" class="headerlink" title="4、线程池的好处"></a><strong>4、线程池的好处</strong></h2><ul>
+<li>降低资源消耗(<code>可以通过重复利用已创建的线程来降低线程创建和销毁造成的消耗</code>)。</li>
+<li>提高相应速度(<code>当任务到达时，任务可以不需要等到线程创建就能立即执行</code>)。</li>
+<li>提高线程的可管理性(<code>线程是稀缺资源，如果无限制创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以进行统一分配、调优和监控</code>)。</li>
+</ul>
+<h2 id="5、线程池的新建"><a href="#5、线程池的新建" class="headerlink" title="5、线程池的新建"></a><strong>5、线程池的新建</strong></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">public class ThreadTest &#123;</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 基于数组的有界阻塞队列</span><br><span class="line">     *&#x2F;</span><br><span class="line">    private static ArrayBlockingQueue arrayBlockingQueue &#x3D; new ArrayBlockingQueue&lt;&gt;(10);</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        &#x2F;**</span><br><span class="line">         * 创建一个线程池</span><br><span class="line">         *&#x2F;</span><br><span class="line">        ThreadPoolExecutor threadPoolExecutor &#x3D; new ThreadPoolExecutor(</span><br><span class="line">                &#x2F;&#x2F; corePoolSize</span><br><span class="line">                5,</span><br><span class="line">                &#x2F;&#x2F; maximumPoolSize</span><br><span class="line">                10,</span><br><span class="line">                &#x2F;&#x2F; keepAliveTime</span><br><span class="line">                10L,</span><br><span class="line">                &#x2F;&#x2F; unit</span><br><span class="line">                TimeUnit.SECONDS,</span><br><span class="line">                &#x2F;&#x2F; workQueue</span><br><span class="line">                arrayBlockingQueue,</span><br><span class="line">                &#x2F;&#x2F; threadFactory</span><br><span class="line">                new ThreadFactoryBuilder().setNameFormat(&quot;wx-%d&quot;).build(),</span><br><span class="line">                &#x2F;&#x2F; handler</span><br><span class="line">                new ThreadPoolExecutor.AbortPolicy());</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; 上面是创建线程池的代码，下面只是用来测试拒绝策略的</span><br><span class="line">        for (int i &#x3D; 0; i &lt; 30; i++)&#123;</span><br><span class="line">            threadPoolExecutor.execute(new Runnable() &#123;</span><br><span class="line">                @SneakyThrows</span><br><span class="line">                @Override</span><br><span class="line">                public void run() &#123;</span><br><span class="line">                    System.out.println(Thread.currentThread().getName());</span><br><span class="line">                    Thread.sleep(5000L);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>corePoolSize：线程池核心线程数大小。</strong><br> 当提交一个任务到线程池时，线程池会创建一个线程来执行任务，即使其他空闲的基本线程能够执行新任务也会创建线程，等到需要执行的任务数大于线程池基本大小时不再创建。</li>
+<li><strong>maximumPoolSize：线程池最大线程数量。</strong><br> 线程池允许创建的最大线程数。如果阻塞队列满了，并且已创建的线程数小于最大线程数，则线程池会在创建新的线程执行任务(<code>如果使用了无界队列，那么这个参数就没什么用了</code>)。</li>
+<li><strong>keepAliveTime：线程池中非核心线程空闲的存活时间大小</strong>。</li>
+<li><strong>unit：线程空闲存活时间单位</strong>。</li>
+<li><strong>workQueue：存放任务的阻塞队列</strong>。<br> 用于保存等待执行的任务的阻塞队列。可以选择以下几个队列：<br> 1、<code>ArrayBlockingQueue</code>:是一个基于数组结构的有界阻塞队列，此队列按FIFO(先进先出)原则对元素进行排序。<br> 2、<code>LinkedBlockingQueue</code>:一个基于链表结构的阻塞队列，此队列按FIFO(先进先出)排序元素，吞吐量通常要高于ArrayBlockingQueue。<br> 3、<code>SynchronousQueue</code>:一个不存储元素的阻塞队列。每个插入操作必须等到另一个线程调用移除操作。否则插入操作一直处于阻塞状态，吞吐量通常要高于LinkedBlockingQueue。<br> 4、<code>PriorityBlockingQueue</code>:一个具有优先级的无限阻塞队列。</li>
+<li><strong>threadFactory：用于设置创建线程的工厂，可以给创建的线程设置有意义的名字，可方便排查问题，也可以设置线程执行出现异常的处理策略(下面文章会讲)</strong>。<br> 如上图，每个线程的name都以wx开头。</li>
+<li><strong>handler：线城池的饱和策略事件，主要有四种类型</strong>。<br> 1、<code>AbortPolicy</code>:直接抛出异常，如下图： <img src="https://imgkr.cn-bj.ufileos.com/e5ece0cd-d84b-4da8-a3c3-72ea29f18558.png" alt="img"> 2、<code>CallerRunsPolicy</code>:用调用者所在线程来运行任务。<br> 3、<code>DiscardOldestPolicy</code>:丢弃队列里最近的一个任务，并执行当前任务。<br> 4、<code>DiscardPolicy</code>:不处理，丢弃掉。</li>
+<li><strong>除了上面这四种，还有一种自定义策略，实现RejectedExecutionHandler接口即可：</strong></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class Handler implements RejectedExecutionHandler &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) &#123;</span><br><span class="line">        &#x2F;&#x2F; 打印线程信息</span><br><span class="line">        System.out.println(r.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://imgkr.cn-bj.ufileos.com/8baa8ff2-0ec9-46b0-9388-a902633fd8f1.png" alt="img"></p>
+<h2 id="6、线程池状态"><a href="#6、线程池状态" class="headerlink" title="6、线程池状态"></a><strong>6、线程池状态</strong></h2><p>线程池的状态主要有以下几种：</p>
+<table>
+<thead>
+<tr>
+<th align="left">状态名称</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">RUNNING</td>
+<td align="center">初始状态，能够接收新任务，以及对已添加的任务进行处理</td>
+</tr>
+<tr>
+<td align="left">SHUTDOWN</td>
+<td align="center">线程池处在SHUTDOWN状态时，不接收新任务，但能处理已添加的任务，处理完成之后才会退出。</td>
+</tr>
+<tr>
+<td align="left">STOP</td>
+<td align="center">线程池处在STOP状态时，不接收新任务，不处理已添加的任务，并且会中断正在处理的任务。</td>
+</tr>
+<tr>
+<td align="left">TIDYING</td>
+<td align="center">当所有的任务已终止，线程池会变为TIDYING状态。当线程池变为TIDYING状态时，会执行钩子函数terminated()。terminated()在ThreadPoolExecutor类中是空的，若用户想在线程池变为TIDYING时，进行相应的处理，可以通过重载terminated()函数来实现。</td>
+</tr>
+<tr>
+<td align="left">TERMINATED</td>
+<td align="center">线程池执行完钩子函数terminated()之后，就变成TERMINATED状态。</td>
+</tr>
+</tbody></table>
+<p>这里有几个要注意的点：</p>
+<ul>
+<li>当调用了shutdown()方法之后，就会从RUNNING转变为SHUTDOWN状态，此时不能再向线程池添加新任务，否则将会抛出RejectedExecutionException异常。</li>
+<li>当调用了shutdownNow()方法之后，就会从RUNNING转变为STOP状态，并试图停止所有正在执行的线程，不再处理还在池队列中等待的任务，当然，它会返回那些未执行的任务。</li>
+<li>当线程池在SHUTDOWN状态下，阻塞队列为空并且线程池中执行的任务也为空时，就会由SHUTDOWN转变为TIDYING状态。当线程池在STOP状态下，线程池中执行的任务为空时，就会由STOP转变为TIDYING状态。</li>
+</ul>
+<p><img src="https://imgkr.cn-bj.ufileos.com/38993e32-2eaf-4f27-876c-224b7325d311.png" alt="图片来源：百度搜索">图片来源：百度搜索</p>
+<h2 id="7、线程池执行任务"><a href="#7、线程池执行任务" class="headerlink" title="7、线程池执行任务"></a><strong>7、线程池执行任务</strong></h2><p>上面我们创建了一个线程池，并且通过execute()方法提交了任务，然后可以看出上面抛出了异常(拒绝策略)，  为什么会这样呢，下面可以看下线程池的处理流程图就明白了：</p>
+<p><img src="https://imgkr.cn-bj.ufileos.com/cdfe30bd-5334-4eed-b240-b9a4a5f38b95.png" alt="img"></p>
+<p>线程池处理任务流程：</p>
+<ul>
+<li>1: 通过判断核心线程池里的线程是否都在执行任务，如果不是，则创建一个线程去执行，如果核心线程都在执行任务。那么就判断阻塞队列。</li>
+<li>2: 判断阻塞队列是否已满，如果没满，就将任务加到队列中，如果满了，就判断创建的线程是否达到了最大数量(<code>所以这里有个问题，如果你队列是无界的，那么可以一直往里面添加任务，这就有可能引起内存溢出，这也是阿里官方手册为什么建议用ThreadPoolExecutor去创建线程池了</code>)。</li>
+<li>3: ，判断创建的线程是否达到了最大数量，如果没有达到，就创建一个线程去执行任务，如果有达到，就执行拒绝策略(<code>默认的拒绝策略是抛出异常，就上面例子抛出的那个异常</code>)。</li>
+</ul>
+<p>接下来看下execute()方法的源代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">public void execute(Runnable command) &#123;</span><br><span class="line">        if (command &#x3D;&#x3D; null)</span><br><span class="line">            throw new NullPointerException();</span><br><span class="line">        &#x2F;&#x2F; 获取当前有效的线程数和线程池的状态</span><br><span class="line">        int c &#x3D; ctl.get();</span><br><span class="line">        &#x2F;&#x2F; 判断正在运行线程数是否小于核心线程池，是则新创建一个线程执行任务，否则将任务放到任务队列中</span><br><span class="line">        if (workerCountOf(c) &lt; corePoolSize) &#123;</span><br><span class="line">            &#x2F;&#x2F; 在addWorker中创建工作线程执行任务</span><br><span class="line">            if (addWorker(command, true))</span><br><span class="line">                return;</span><br><span class="line">            c &#x3D; ctl.get();</span><br><span class="line">        &#125;</span><br><span class="line">        &#x2F;&#x2F; 线程池是否处于运行状态，且是否任务插入任务队列成功</span><br><span class="line">        if (isRunning(c) &amp;&amp; workQueue.offer(command)) &#123;</span><br><span class="line">            int recheck &#x3D; ctl.get();</span><br><span class="line">            &#x2F;&#x2F; 线程池是否处于运行状态，如果不是则使刚刚的任务出队</span><br><span class="line">            if (! isRunning(recheck) &amp;&amp; remove(command))</span><br><span class="line">                &#x2F;&#x2F; 执行拒绝策略</span><br><span class="line">                reject(command);</span><br><span class="line">            else if (workerCountOf(recheck) &#x3D;&#x3D; 0)</span><br><span class="line">                addWorker(null, false);</span><br><span class="line">        &#125;</span><br><span class="line">        &#x2F;&#x2F; 插入队列不成功，且当前线程数数量小于最大线程池数量，此时则创建新线程执行任务，创建失败的话就执行拒绝策略</span><br><span class="line">        else if (!addWorker(command, false))</span><br><span class="line">            reject(command);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看出，execute()方法是<code>没有返回值的</code>，所以你提交任务之后，是无法判断任务是否被多线程执行成功，所以多线程还有一种提交方式，submit()方法，通过submit()方法提交任务，线程池会返回一个future类型的对象，通过这个future对象可以判断任务是否提交成功，，并且可以通过future.get()来获取返回值，get()方法会阻塞当前线程直到任务完成。实例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">public class ThreadTest &#123;</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 基于数组的有界阻塞队列</span><br><span class="line">     *&#x2F;</span><br><span class="line">    private static ArrayBlockingQueue arrayBlockingQueue &#x3D; new ArrayBlockingQueue&lt;&gt;(10);</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        &#x2F;**</span><br><span class="line">         * 创建一个线程池</span><br><span class="line">         *&#x2F;</span><br><span class="line">        ThreadPoolExecutor threadPoolExecutor &#x3D; new ThreadPoolExecutor(</span><br><span class="line">                &#x2F;&#x2F; corePoolSize</span><br><span class="line">                5,</span><br><span class="line">                &#x2F;&#x2F; maximumPoolSize</span><br><span class="line">                10,</span><br><span class="line">                &#x2F;&#x2F; keepAliveTime</span><br><span class="line">                10L,</span><br><span class="line">                &#x2F;&#x2F; unit</span><br><span class="line">                TimeUnit.SECONDS,</span><br><span class="line">                &#x2F;&#x2F; workQueue</span><br><span class="line">                arrayBlockingQueue,</span><br><span class="line">                &#x2F;&#x2F; threadFactory</span><br><span class="line">                new ThreadFactoryBuilder().setNameFormat(&quot;wx-%d&quot;).build(),</span><br><span class="line">                &#x2F;&#x2F; handler</span><br><span class="line">                new Handler());</span><br><span class="line"></span><br><span class="line">        Future&lt;?&gt; submit &#x3D; null;</span><br><span class="line">        &#x2F;&#x2F; 上面是创建线程池的代码，下面只是用来测试拒绝策略的</span><br><span class="line">        for (int i &#x3D; 0; i &lt; 10; i++)&#123;</span><br><span class="line">            int num &#x3D; i;</span><br><span class="line">            submit &#x3D; threadPoolExecutor.submit(new Runnable() &#123;</span><br><span class="line">                @SneakyThrows</span><br><span class="line">                @Override</span><br><span class="line">                public void run() &#123;</span><br><span class="line">                    System.out.println(Thread.currentThread().getName());</span><br><span class="line">                    Thread.sleep(5000L);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">            try &#123;</span><br><span class="line">                submit.get();</span><br><span class="line">            &#125;catch (Exception e)&#123;</span><br><span class="line">                System.out.println(&quot;线程执行出现异常&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://imgkr.cn-bj.ufileos.com/359ce9b4-24aa-406a-98f8-58ff2dfa76bf.png" alt="img"></p>
+<h2 id="线程池异常处理"><a href="#线程池异常处理" class="headerlink" title="线程池异常处理"></a><strong>线程池异常处理</strong></h2><p>先来看一段代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">public class ThreadTest &#123;</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 基于数组的有界阻塞队列</span><br><span class="line">     *&#x2F;</span><br><span class="line">    private static ArrayBlockingQueue arrayBlockingQueue &#x3D; new ArrayBlockingQueue&lt;&gt;(10);</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        &#x2F;**</span><br><span class="line">         * 创建一个线程池</span><br><span class="line">         *&#x2F;</span><br><span class="line">        ThreadPoolExecutor threadPoolExecutor &#x3D; new ThreadPoolExecutor(</span><br><span class="line">                &#x2F;&#x2F; corePoolSize</span><br><span class="line">                5,</span><br><span class="line">                &#x2F;&#x2F; maximumPoolSize</span><br><span class="line">                10,</span><br><span class="line">                &#x2F;&#x2F; keepAliveTime</span><br><span class="line">                10L,</span><br><span class="line">                &#x2F;&#x2F; unit</span><br><span class="line">                TimeUnit.SECONDS,</span><br><span class="line">                &#x2F;&#x2F; workQueue</span><br><span class="line">                arrayBlockingQueue,</span><br><span class="line">                &#x2F;&#x2F; threadFactory</span><br><span class="line">                new ThreadFactoryBuilder().setNameFormat(&quot;wx-%d&quot;).build(),</span><br><span class="line">                &#x2F;&#x2F; handler</span><br><span class="line">                new Handler());</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; 上面是创建线程池的代码，下面只是用来测试拒绝策略的</span><br><span class="line">        for (int i &#x3D; 0; i &lt; 10; i++)&#123;</span><br><span class="line">            int num &#x3D; i;</span><br><span class="line">            threadPoolExecutor.submit(new Runnable() &#123;</span><br><span class="line">                @SneakyThrows</span><br><span class="line">                @Override</span><br><span class="line">                public void run() &#123;</span><br><span class="line">                    if (num &#x3D;&#x3D; 4)&#123;</span><br><span class="line">                        throw new RuntimeException();</span><br><span class="line">                    &#125;else &#123;</span><br><span class="line">                        System.out.println(Thread.currentThread().getName());</span><br><span class="line">                        Thread.sleep(5000L);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码可以看到，当i=4的时候，会抛出一个异常，然后看下结果：</p>
+<p><img src="https://imgkr.cn-bj.ufileos.com/7b23e2c1-ef73-4374-8f0a-12624ac92d84.png" alt="img"></p>
+<p>本该打印10行结果的，现在只打印了9行，执行报错但是没有抛出异常，这样我们无法感知任务出现了异常，也就无法做相应处理。</p>
+<p>但你把上面代码的提交方式改为<code>execute()</code>，再次运行，你会发现有异常抛出的：</p>
+<p><img src="https://imgkr.cn-bj.ufileos.com/81d4b6c9-c164-4d21-92d5-16c4cd3059ff.png" alt="img"></p>
+<p>这是为啥子呢，怎么解决呢，先来说怎么解决，再说为啥submit()方法提交任务会将其中可能发生的异常<code>吃</code>掉。解决方法如下：</p>
+<ul>
+<li><strong>添加try/catch捕获异常</strong></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">public class ThreadTest &#123;</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 基于数组的有界阻塞队列</span><br><span class="line">     *&#x2F;</span><br><span class="line">    private static ArrayBlockingQueue arrayBlockingQueue &#x3D; new ArrayBlockingQueue&lt;&gt;(10);</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        &#x2F;**</span><br><span class="line">         * 创建一个线程池</span><br><span class="line">         *&#x2F;</span><br><span class="line">        ThreadPoolExecutor threadPoolExecutor &#x3D; new ThreadPoolExecutor(</span><br><span class="line">                &#x2F;&#x2F; corePoolSize</span><br><span class="line">                5,</span><br><span class="line">                &#x2F;&#x2F; maximumPoolSize</span><br><span class="line">                10,</span><br><span class="line">                &#x2F;&#x2F; keepAliveTime</span><br><span class="line">                10L,</span><br><span class="line">                &#x2F;&#x2F; unit</span><br><span class="line">                TimeUnit.SECONDS,</span><br><span class="line">                &#x2F;&#x2F; workQueue</span><br><span class="line">                arrayBlockingQueue,</span><br><span class="line">                &#x2F;&#x2F; threadFactory</span><br><span class="line">                new ThreadFactoryBuilder().setNameFormat(&quot;wx-%d&quot;).build(),</span><br><span class="line">                &#x2F;&#x2F; handler</span><br><span class="line">                new Handler());</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; 上面是创建线程池的代码，下面只是用来测试拒绝策略的</span><br><span class="line">        for (int i &#x3D; 0; i &lt; 10; i++)&#123;</span><br><span class="line">            int num &#x3D; i;</span><br><span class="line">            threadPoolExecutor.submit(new Runnable() &#123;</span><br><span class="line">                @SneakyThrows</span><br><span class="line">                @Override</span><br><span class="line">                public void run() &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        if (num &#x3D;&#x3D; 4)&#123;</span><br><span class="line">                            throw new RuntimeException();</span><br><span class="line">                        &#125;else &#123;</span><br><span class="line">                            System.out.println(Thread.currentThread().getName());</span><br><span class="line">                            Thread.sleep(5000L);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;catch (Exception e)&#123;</span><br><span class="line">                        System.out.println(&quot;线程：&quot; + Thread.currentThread().getName() + &quot;执行任务出现了异常&quot;);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>查看结果：</p>
+<p><img src="https://imgkr.cn-bj.ufileos.com/f3e4129e-e180-4414-be9c-25be9b8ea773.png" alt="img"></p>
+<ul>
+<li><strong>利用submit()方法返回的future对象的get()方法来查看程序执行是否有异常产生：</strong></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">public class ThreadTest &#123;</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 基于数组的有界阻塞队列</span><br><span class="line">     *&#x2F;</span><br><span class="line">    private static ArrayBlockingQueue arrayBlockingQueue &#x3D; new ArrayBlockingQueue&lt;&gt;(10);</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        &#x2F;**</span><br><span class="line">         * 创建一个线程池</span><br><span class="line">         *&#x2F;</span><br><span class="line">        ThreadPoolExecutor threadPoolExecutor &#x3D; new ThreadPoolExecutor(</span><br><span class="line">                &#x2F;&#x2F; corePoolSize</span><br><span class="line">                5,</span><br><span class="line">                &#x2F;&#x2F; maximumPoolSize</span><br><span class="line">                10,</span><br><span class="line">                &#x2F;&#x2F; keepAliveTime</span><br><span class="line">                10L,</span><br><span class="line">                &#x2F;&#x2F; unit</span><br><span class="line">                TimeUnit.SECONDS,</span><br><span class="line">                &#x2F;&#x2F; workQueue</span><br><span class="line">                arrayBlockingQueue,</span><br><span class="line">                &#x2F;&#x2F; threadFactory</span><br><span class="line">                new ThreadFactoryBuilder().setNameFormat(&quot;wx-%d&quot;).build(),</span><br><span class="line">                &#x2F;&#x2F; handler</span><br><span class="line">                new Handler());</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; 上面是创建线程池的代码，下面只是用来测试拒绝策略的</span><br><span class="line">        for (int i &#x3D; 0; i &lt; 10; i++)&#123;</span><br><span class="line">            int num &#x3D; i;</span><br><span class="line">            Future&lt;?&gt; submit &#x3D; threadPoolExecutor.submit(new Runnable() &#123;</span><br><span class="line">                @SneakyThrows</span><br><span class="line">                @Override</span><br><span class="line">                public void run() &#123;</span><br><span class="line">                    if (num &#x3D;&#x3D; 4) &#123;</span><br><span class="line">                        throw new RuntimeException();</span><br><span class="line">                    &#125; else &#123;</span><br><span class="line">                        System.out.println(Thread.currentThread().getName());</span><br><span class="line">                        Thread.sleep(5000L);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">            try &#123;</span><br><span class="line">                submit.get();</span><br><span class="line">            &#125;catch (Exception e)&#123;</span><br><span class="line">                System.out.println(&quot;线程：&quot; + Thread.currentThread().getName() + &quot;执行任务出现了异常&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>查看结果：</p>
+<p><img src="https://imgkr.cn-bj.ufileos.com/cc974047-4b7b-4ac7-a369-84884b4c84ce.png" alt="img"></p>
+<p>你会发现，<code>它不像上面那个try/catch具体到线程池内那个线程出现了问题，而是说你的主线程执行任务出现了异常</code>。</p>
+<ul>
+<li><strong><code>还有一种解决方案，这种异常解决方案是execute()方法提交的任务执行出现异常的处理方式，submit()方法提交的不适用。</code>在定义ThreadFactory的时候，调用setUncaughtExceptionHandler()方法来自定义异常处理方式：</strong></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">public class ThreadTest &#123;</span><br><span class="line"></span><br><span class="line">    private static final Logger logger &#x3D; LoggerFactory.getLogger(ThreadTest.class);</span><br><span class="line"></span><br><span class="line">    &#x2F;**</span><br><span class="line">     * 基于数组的有界阻塞队列</span><br><span class="line">     *&#x2F;</span><br><span class="line">    private static ArrayBlockingQueue arrayBlockingQueue &#x3D; new ArrayBlockingQueue&lt;&gt;(10);</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        &#x2F;**</span><br><span class="line">         * 创建一个线程池</span><br><span class="line">         *&#x2F;</span><br><span class="line">        ThreadPoolExecutor threadPoolExecutor &#x3D; new ThreadPoolExecutor(</span><br><span class="line">                &#x2F;&#x2F; corePoolSize</span><br><span class="line">                5,</span><br><span class="line">                &#x2F;&#x2F; maximumPoolSize</span><br><span class="line">                10,</span><br><span class="line">                &#x2F;&#x2F; keepAliveTime</span><br><span class="line">                10L,</span><br><span class="line">                &#x2F;&#x2F; unit</span><br><span class="line">                TimeUnit.SECONDS,</span><br><span class="line">                &#x2F;&#x2F; workQueue</span><br><span class="line">                arrayBlockingQueue,</span><br><span class="line">                &#x2F;&#x2F; threadFactory</span><br><span class="line">                new ThreadFactoryBuilder()</span><br><span class="line">                        &#x2F;&#x2F; 设置线程名称</span><br><span class="line">                        .setNameFormat(&quot;wx-%d&quot;)</span><br><span class="line">                        &#x2F;&#x2F; 添加自定义异常处理方式：打印error日志</span><br><span class="line">                        .setUncaughtExceptionHandler((thread, throwable)-&gt; logger.error(&quot;ThreadPoolExecutor &#123;&#125; produce exception&quot;, thread,throwable))</span><br><span class="line">                        .build(),</span><br><span class="line">                &#x2F;&#x2F; handler</span><br><span class="line">                new Handler());</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; 上面是创建线程池的代码，下面只是用来测试拒绝策略的</span><br><span class="line">        for (int i &#x3D; 0; i &lt; 10; i++)&#123;</span><br><span class="line">            int num &#x3D; i;</span><br><span class="line">            threadPoolExecutor.execute(new Runnable() &#123;</span><br><span class="line">                @SneakyThrows</span><br><span class="line">                @Override</span><br><span class="line">                public void run() &#123;</span><br><span class="line">                    if (num &#x3D;&#x3D; 4) &#123;</span><br><span class="line">                        throw new RuntimeException();</span><br><span class="line">                    &#125; else &#123;</span><br><span class="line">                        System.out.println(Thread.currentThread().getName());</span><br><span class="line">                        Thread.sleep(5000L);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>查看结果：</p>
+<p><img src="https://imgkr.cn-bj.ufileos.com/3684277c-7dd4-4418-88a5-6d71ea7d79b5.png" alt="img"></p>
+<h2 id="为什么submit-方法提交任务产生异常会被”吞掉”"><a href="#为什么submit-方法提交任务产生异常会被”吞掉”" class="headerlink" title="为什么submit()方法提交任务产生异常会被”吞掉”"></a><strong>为什么submit()方法提交任务产生异常会被”吞掉”</strong></h2><p>说到这个问题，我们得先来看下submit()方法的源码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public Future&lt;?&gt; submit(Runnable task) &#123;</span><br><span class="line">        if (task &#x3D;&#x3D; null) throw new NullPointerException();</span><br><span class="line">        &#x2F;&#x2F; 任务被包装成RunnableFuture对象，准备添加到工作队列中</span><br><span class="line">        RunnableFuture&lt;Void&gt; ftask &#x3D; newTaskFor(task, null);</span><br><span class="line">        execute(ftask);</span><br><span class="line">        return ftask;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>newTaskFor()方法代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">protected &lt;T&gt; RunnableFuture&lt;T&gt; newTaskFor(Runnable runnable, T value) &#123;</span><br><span class="line">        return new FutureTask&lt;T&gt;(runnable, value);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>FutureTask类代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public class FutureTask&lt;V&gt; implements RunnableFuture&lt;V&gt; &#123;</span><br><span class="line">  ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>RunnableFuture接口提供了一个run()方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public interface RunnableFuture&lt;V&gt; extends Runnable, Future&lt;V&gt; &#123;</span><br><span class="line">    &#x2F;**</span><br><span class="line">     * Sets this Future to the result of its computation</span><br><span class="line">     * unless it has been cancelled.</span><br><span class="line">     *&#x2F;</span><br><span class="line">    void run();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>看下FutureTask类的run()方法做了什么：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">public void run() &#123;</span><br><span class="line">        if (state !&#x3D; NEW ||</span><br><span class="line">            !UNSAFE.compareAndSwapObject(this, runnerOffset,</span><br><span class="line">                                         null, Thread.currentThread()))</span><br><span class="line">            return;</span><br><span class="line">        try &#123;</span><br><span class="line">            Callable&lt;V&gt; c &#x3D; callable;</span><br><span class="line">            if (c !&#x3D; null &amp;&amp; state &#x3D;&#x3D; NEW) &#123;</span><br><span class="line">                V result;</span><br><span class="line">                boolean ran;</span><br><span class="line">                try &#123;</span><br><span class="line">                    result &#x3D; c.call();</span><br><span class="line">                    ran &#x3D; true;</span><br><span class="line">                &#125; catch (Throwable ex) &#123;</span><br><span class="line">                    result &#x3D; null;</span><br><span class="line">                    ran &#x3D; false;</span><br><span class="line">                    &#x2F;&#x2F; 捕获异常</span><br><span class="line">                    setException(ex);</span><br><span class="line">                &#125;</span><br><span class="line">                if (ran)</span><br><span class="line">                    set(result);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            &#x2F;&#x2F; runner must be non-null until state is settled to</span><br><span class="line">            &#x2F;&#x2F; prevent concurrent calls to run()</span><br><span class="line">            runner &#x3D; null;</span><br><span class="line">            &#x2F;&#x2F; state must be re-read after nulling runner to prevent</span><br><span class="line">            &#x2F;&#x2F; leaked interrupts</span><br><span class="line">            int s &#x3D; state;</span><br><span class="line">            if (s &gt;&#x3D; INTERRUPTING)</span><br><span class="line">                handlePossibleCancellationInterrupt(s);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>再看下setException()方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">protected void setException(Throwable t) &#123;</span><br><span class="line">        if (UNSAFE.compareAndSwapInt(this, stateOffset, NEW, COMPLETING)) &#123;</span><br><span class="line">            &#x2F;&#x2F; 将异常放入outcome对象中</span><br><span class="line">            outcome &#x3D; t;</span><br><span class="line">            UNSAFE.putOrderedInt(this, stateOffset, EXCEPTIONAL); &#x2F;&#x2F; final state</span><br><span class="line">            finishCompletion();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>至此，我们可以看到，submit()方法其实是将任务包装成RunnableFuture对象，其实最终是一个FutureTask实例，FutureTask实现了Future和Runnable接口。重写了run()，而在run()方法里面，<code>该任务抛出的异常将被捕获，通过setException()方法将异常放在outcome中</code>，这就是为什么没有抛出异常的原因。</p>
+<p>那么问题来了，为什么调用submit()提交任务之后返回的FutureTask对象的get()方法就会看到异常呢，看get()方法源码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public V get() throws InterruptedException, ExecutionException &#123;</span><br><span class="line">        int s &#x3D; state;</span><br><span class="line">        if (s &lt;&#x3D; COMPLETING)</span><br><span class="line">            s &#x3D; awaitDone(false, 0L);</span><br><span class="line">        return report(s);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>report()方法代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">private V report(int s) throws ExecutionException &#123;</span><br><span class="line">        Object x &#x3D; outcome;</span><br><span class="line">        if (s &#x3D;&#x3D; NORMAL)</span><br><span class="line">            return (V)x;</span><br><span class="line">        if (s &gt;&#x3D; CANCELLED)</span><br><span class="line">            throw new CancellationException();</span><br><span class="line">        throw new ExecutionException((Throwable)x);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>因为get()方法会将存放异常的outcome对象返回出去</code>，这就是为什么调用submit()提交任务之后返回的FutureTask对象的get()方法就会看到异常的原因！</p>
+<h2 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a><strong>结尾</strong></h2><p><strong>如果你觉得我的文章对你有帮助话，欢迎关注我的微信公众号:”一个快乐又痛苦的程序员”（无广告，单纯分享原创文章、已pj的实用工具、各种Java学习资源，期待与你共同进步)</strong></p>
+<p><img src="https://imgkr.cn-bj.ufileos.com/8e2fc421-3a92-4d2b-bff3-c696f3473bf9.png" alt="img"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E5%B9%B6%E5%8F%91%E8%89%BA%E6%9C%AF/" rel="tag"># 并发艺术</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/03/%E9%9D%A2%E8%AF%95%E5%BF%85%E9%97%AE%EF%BC%9A%E4%B9%90%E8%A7%82%E9%94%81%E4%B8%8E%E6%82%B2%E8%A7%82%E9%94%81/" rel="next" title="面试必问：乐观锁与悲观锁">
+                <i class="fa fa-chevron-left"></i> 面试必问：乐观锁与悲观锁
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="wanxi" />
+            
+              <p class="site-author-name" itemprop="name">wanxi</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/weiwanx" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/qq_35364594" target="_blank" title="csdn">
+                      
+                        <i class="fa fa-fw fa-crosshairs"></i>csdn</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://juejin.im/user/5ddbaddd6fb9a07aad3827a8/posts" target="_blank" title="掘金">
+                      
+                        <i class="fa fa-fw fa-spinner"></i>掘金</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="weiwanx@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1、什么是线程-什么是多线程"><span class="nav-number">2.</span> <span class="nav-text">1、什么是线程(什么是多线程)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、线程状态"><span class="nav-number">3.</span> <span class="nav-text">2、线程状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3、多线程的优点和弊端"><span class="nav-number">4.</span> <span class="nav-text">3、多线程的优点和弊端</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-优点"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-弊端"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 弊端</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4、线程池的好处"><span class="nav-number">5.</span> <span class="nav-text">4、线程池的好处</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5、线程池的新建"><span class="nav-number">6.</span> <span class="nav-text">5、线程池的新建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6、线程池状态"><span class="nav-number">7.</span> <span class="nav-text">6、线程池状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7、线程池执行任务"><span class="nav-number">8.</span> <span class="nav-text">7、线程池执行任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线程池异常处理"><span class="nav-number">9.</span> <span class="nav-text">线程池异常处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么submit-方法提交任务产生异常会被”吞掉”"><span class="nav-number">10.</span> <span class="nav-text">为什么submit()方法提交任务产生异常会被”吞掉”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结尾"><span class="nav-number">11.</span> <span class="nav-text">结尾</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wanxi</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
