@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="数据库," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1、吹吹水前几天老大问我怎么进行sql优化的，我回答了新建索引。哈哈哈，然后老大就出去找棍子了，进来之后跟我说你知道门在哪边吧，自己出去还是我请你出去？  然后被迫出去挨打，回来之后老大说去看下什么是Explain，然后交一份5000字检讨上来。。。。。。 1以下内容以MySQL 8.0进行描述  2、基础内容既然想优化sql，那么新建索引也确实没错，只不过不能看见一个字段就建一个索引，这样就确">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SQL优化如何才能hold住">
+<meta property="og:url" content="http://yoursite.com/2020/06/21/SQL%E4%BC%98%E5%8C%96%E5%A6%82%E4%BD%95%E6%89%8D%E8%83%BDhold%E4%BD%8F/index.html">
+<meta property="og:site_name" content="少年肩头">
+<meta property="og:description" content="1、吹吹水前几天老大问我怎么进行sql优化的，我回答了新建索引。哈哈哈，然后老大就出去找棍子了，进来之后跟我说你知道门在哪边吧，自己出去还是我请你出去？  然后被迫出去挨打，回来之后老大说去看下什么是Explain，然后交一份5000字检讨上来。。。。。。 1以下内容以MySQL 8.0进行描述  2、基础内容既然想优化sql，那么新建索引也确实没错，只不过不能看见一个字段就建一个索引，这样就确">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/fb74baac-4097-4328-a8a3-791b95c3dfae.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/e2ade703-4d61-468f-b5b0-a2b2c970ed04.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/3d001dc7-7ec0-4812-9a43-55b8bf92546c.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/964b0285-8188-4e03-b01c-4d081b225c79.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/ee7e2b6d-ca67-4006-863e-86ba3ef9067a.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/3796ef24-b17c-4bdf-9caa-329f599be467.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/3796ef24-b17c-4bdf-9caa-329f599be467.png">
+<meta property="og:image" content="https://static01.imgkr.com/temp/33c6e1140611401c992d1a8240f3b32f.png">
+<meta property="og:image" content="https://static01.imgkr.com/temp/4c2d847d5358440fa770be3688c78944.png">
+<meta property="og:image" content="https://static01.imgkr.com/temp/7859396368ca4a8d96ea37405d4ceba7.png">
+<meta property="og:image" content="https://static01.imgkr.com/temp/9a3e3f236f4f45ee85562c33d44ce2ac.png">
+<meta property="og:image" content="https://static01.imgkr.com/temp/943b6863a80a4cdaa775f1e80bad76ed.png">
+<meta property="og:image" content="https://static01.imgkr.com/temp/6949f4009c99445d913ca992ac885d04.png">
+<meta property="og:image" content="https://static01.imgkr.com/temp/7d6e1d7c52d649debe9f9d3a774552bc.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/8e2fc421-3a92-4d2b-bff3-c696f3473bf9.png">
+<meta property="article:published_time" content="2020-06-21T02:53:34.000Z">
+<meta property="article:modified_time" content="2020-06-21T02:54:48.000Z">
+<meta property="article:author" content="wanxi">
+<meta property="article:tag" content="数据库">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://imgkr.cn-bj.ufileos.com/fb74baac-4097-4328-a8a3-791b95c3dfae.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/06/21/SQL优化如何才能hold住/"/>
+
+
+
+
+
+  <title>SQL优化如何才能hold住 | 少年肩头</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/weiwanx" target="_blank" rel="noopener" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">少年肩头</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/21/SQL%E4%BC%98%E5%8C%96%E5%A6%82%E4%BD%95%E6%89%8D%E8%83%BDhold%E4%BD%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wanxi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="少年肩头">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SQL优化如何才能hold住</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-21T10:53:34+08:00">
+                2020-06-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mysql/" itemprop="url" rel="index">
+                    <span itemprop="name">Mysql</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://imgkr.cn-bj.ufileos.com/fb74baac-4097-4328-a8a3-791b95c3dfae.png" alt="img"></p>
+<h2 id="1、吹吹水"><a href="#1、吹吹水" class="headerlink" title="1、吹吹水"></a><strong>1、吹吹水</strong></h2><p>前几天老大问我怎么进行sql优化的，我回答了<code>新建索引</code>。哈哈哈，然后老大就出去找棍子了，进来之后跟我说你知道门在哪边吧，自己出去还是我请你出去？ <img src="https://imgkr.cn-bj.ufileos.com/e2ade703-4d61-468f-b5b0-a2b2c970ed04.png" alt="img"> 然后被迫出去挨打，回来之后老大说去看下什么是<code>Explain</code>，然后交一份5000字检讨上来。。。。。。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">以下内容以MySQL 8.0进行描述</span><br></pre></td></tr></table></figure>
+
+<h2 id="2、基础内容"><a href="#2、基础内容" class="headerlink" title="2、基础内容"></a><strong>2、基础内容</strong></h2><p>既然想优化sql，那么新建索引也确实没错，只不过<code>不能看见一个字段就建一个索引</code>，这样就确实容易挨打，那先说下新建索引到底mysql做了什么操作：<br> 首先InnoDB的索引模型是<code>B+树</code>，在InnoDB中，表都是根据主键顺序以索引的形式存放的，这种存储方式的表称为索引组织表。而每新建一个索引，就在InnoDB里面对应一棵B+树。假设，我们有一个主键列为id的表，表中有字段k、name，并且在k上有索引。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">create table T(</span><br><span class="line">id int primary key, </span><br><span class="line">k int not null, </span><br><span class="line">name varchar(16),</span><br><span class="line">index (k))engine&#x3D;InnoDB;</span><br></pre></td></tr></table></figure>
+
+<p>往表中插入三条数据：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO T (id, k) VALUES (100, 1);</span><br><span class="line">INSERT INTO T (id, k) VALUES (200, 2);</span><br><span class="line">INSERT INTO T (id, k) VALUES (300, 3);</span><br><span class="line">INSERT INTO T (id, k) VALUES (500, 5);</span><br><span class="line">INSERT INTO T (id, k) VALUES (600, 6);</span><br></pre></td></tr></table></figure>
+
+<p>两棵树的示例示意图如下： <img src="https://imgkr.cn-bj.ufileos.com/3d001dc7-7ec0-4812-9a43-55b8bf92546c.png" alt="img"> 从图中可以看出，每新建一个索引，就<code>新加了一颗B+树</code>，而索引又分为<code>主键索引</code>和<code>非主键索引</code>：<br> <code>主键索引:</code>主键索引的叶子节点存的是整行数据。在InnoDB里，主键索引也被称为<code>聚簇索引</code>（clustered index）。<br> <code>非主键索引:</code>非主键索引的叶子节点内容是主键的值。在InnoDB里，非主键索引也被称为<code>二级索引</code>（secondary index）。</p>
+<p>那么现在执行一条查询语句：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from T where id&#x3D;500;</span><br></pre></td></tr></table></figure>
+
+<p>这条语句只需要搜索id这棵B+树，然后就会返回叶子节点的所有数据。</p>
+<p>下一条查询语句：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from T where k&#x3D;5</span><br></pre></td></tr></table></figure>
+
+<p>这条语句首先需要去索引k的这颗B+树，然后查到了k=5对应的主键id是500，在通过这个主键id再去id索引树查询一次然后返回数据，这个来回的过程就叫做<code>回表</code>。</p>
+<p>也就是说，基于非主键索引的查询需要多扫描一棵索引树。因此，我们在应用中应该尽量使用主键查询。</p>
+<p>当然，我也知道，在实际开发中，很少能用到主键查询的，因为主键一般不存在于业务流程中，那么再来看下下面这个语句：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select id from T where k&#x3D;5</span><br></pre></td></tr></table></figure>
+
+<p>这条语句和上面的语句最大的区别就是上面语句查询的是所有字段，而下面这个语句查询的只有id，而k字段索引树叶子节点保存的就是id值，就可以直接返回，不用再回表查询id索引树了，这就叫做<code>覆盖索引</code>。</p>
+<ul>
+<li>由于覆盖索引可以减少树的搜索次数，显著提升查询性能，所以使用覆盖索引是一个常用的性能优化手段。</li>
+</ul>
+<p>基于上面覆盖索引的说明，再来看一个例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE &#96;tuser&#96; (</span><br><span class="line">  &#96;id&#96; int(11) NOT NULL,</span><br><span class="line">  &#96;id_card&#96; varchar(32) DEFAULT NULL,</span><br><span class="line">  &#96;name&#96; varchar(32) DEFAULT NULL,</span><br><span class="line">  &#96;age&#96; int(11) DEFAULT NULL,</span><br><span class="line">  &#96;ismale&#96; tinyint(1) DEFAULT NULL,</span><br><span class="line">  PRIMARY KEY (&#96;id&#96;),</span><br><span class="line">  KEY &#96;id_card&#96; (&#96;id_card&#96;),</span><br><span class="line">  KEY &#96;name_age&#96; (&#96;name&#96;,&#96;age&#96;)</span><br><span class="line">) ENGINE&#x3D;InnoDB</span><br></pre></td></tr></table></figure>
+
+<p>建表语句中可以看到，有个主键索引id，有两个二级索引id_card和name_age，而name_age是由两个字段组成的索引(也可以是多个字段)，叫做<code>组合索引</code>。假设现在要执行如下语句：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select id from tuser where name like ‘张%’;</span><br></pre></td></tr></table></figure>
+
+<p>上面这条查询语句，虽然没有在name字段添加单独索引，但是他有个组合索引，所以上面这条语句也是能用到索引的： <img src="https://imgkr.cn-bj.ufileos.com/964b0285-8188-4e03-b01c-4d081b225c79.png" alt="img"> 可以看到，索引项是按照索引定义里面出现的字段顺序排序的，上面这条语句可以用上这个组合索引，查找到第一个符合条件的记录是ID3，然后向后遍历，直到不满足条件为止。</p>
+<p>但是如果组合索引定义为<code>name_age</code> (<code>age</code>,<code>name</code>)这样的话，上面这条查询语句就用不上这个组合索引了，这就叫做<code>最左前缀原则</code>。</p>
+<ul>
+<li>单表索引不能过多，业界有个不成文的规定，单表字段不超过20个，索引不超过5个，因为随着数据量的增加，过多的索引会占据很多物理空间。</li>
+</ul>
+<p>当然，这些都是些基础sql，遇到一些比较复杂的sql语句，怎么优化呢，这就要用到<code>Explain执行计划</code>了，先来看下举例吧(这条sql语句很复杂，是现在公司用到的，所以打个码，不好意思哈)： <img src="https://imgkr.cn-bj.ufileos.com/ee7e2b6d-ca67-4006-863e-86ba3ef9067a.png" alt="img"> 重点在这里： <img src="https://imgkr.cn-bj.ufileos.com/3796ef24-b17c-4bdf-9caa-329f599be467.png" alt="img"> <code>通过Explain关键字，可以看出来每个查询扫描的行数，用到了哪个索引等等，下面文章，会讲每个字段的意思，然后看下如何优化。。。。。。</code></p>
+<h2 id="3、Explain执行计划详解"><a href="#3、Explain执行计划详解" class="headerlink" title="3、Explain执行计划详解"></a><strong>3、Explain执行计划详解</strong></h2><p>就拿上面的图片来说，Explain主要通过以下字段来显示有关优化器的期望如何与实际执行相匹配的时间以及基于迭代器的其他信息： <img src="https://imgkr.cn-bj.ufileos.com/3796ef24-b17c-4bdf-9caa-329f599be467.png" alt="img"></p>
+<h3 id="id"><a href="#id" class="headerlink" title="id"></a>id</h3><p>id是执行顺序，就是每条语句的执行优先级，有可能相同(<code>这种情况就由优化器决定</code>)，也有可能不同(<code>id值越大优先级越高，越先被执行</code>)。</p>
+<h3 id="select-type"><a href="#select-type" class="headerlink" title="select_type"></a>select_type</h3><p>表示 select 查询的类型，主要是用于区分各种复杂的查询，像<code>普通查询、联合查询、子查询</code>等，值主要有以下几点：</p>
+<ul>
+<li>SIMPLE：表示最简单的 select 查询语句，也就是在查询中不包含子查询或者union取并集等操作。</li>
+<li>PRIMARY：当查询语句中包含任何复杂的子部分，最外层查询则被标记为PRIMARY。</li>
+<li>SUBQUERY：当 select 或 where 列表中包含了子查询，该子查询被标记为：SUBQUERY 。</li>
+<li>DERIVED：表示包含在from子句中的子查询的select，from列表中包含的子查询会被标记为derived 。</li>
+<li>UNION：如果union后边又出现的select语句，则会被标记为union；若union包含在from子句的子查询中，外层select 将被标记为derived。</li>
+<li>UNION RESULT：代表从union的临时表中读取数据，而table列的&lt;union1,4&gt;表示用第一个和第四个select的结果进行union操作。</li>
+</ul>
+<h3 id="table"><a href="#table" class="headerlink" title="table"></a>table</h3><p>查询的表名，<code>并不一定是真实存在的表</code>，如果给表指定了别名，<code>则显示别名</code>，也可能为临时表。(只是个表名，就注释一下)</p>
+<h3 id="partitions"><a href="#partitions" class="headerlink" title="partitions"></a>partitions</h3><p>查询时匹配到的分区信息，对于非分区表值为NULL，当查询的是分区表时，partitions显示分区表命中的分区情况。</p>
+<h3 id="type"><a href="#type" class="headerlink" title="type"></a>type</h3><p>查询使用了何种类型，它在 SQL优化中是一个非常重要的指标，以下性能从好到坏依次是：<code>system</code>  &gt; <code>const</code> &gt; <code>eq_ref</code> &gt; <code>ref</code> &gt; <code>ref_or_null</code> &gt; <code>index_merge</code> &gt; <code>unique_subquery</code> &gt; <code>index_subquery</code> &gt; <code>range</code> &gt; <code>index</code> &gt; <code>ALL</code></p>
+<ul>
+<li>system： 当表仅有一行记录时(系统表)，数据量很少，往往不需要进行磁盘IO，速度非常快。</li>
+<li>const：表示查询时命中 primary key 主键或者 unique 唯一索引，或者被连接的部分是一个常量(const)值。这类扫描效率极高，返回数据量少，速度非常快。</li>
+<li>eq_ref：查询时命中主键primary key 或者 unique key索引。</li>
+<li>ref：区别于eq_ref ，ref表示使用非唯一性索引，会找到很多个符合条件的行。</li>
+<li>ref_or_null：这种连接类型类似于 ref，区别在于 MySQL会额外搜索包含NULL值的行。</li>
+<li>index_merge：使用了索引合并优化方法，查询使用了两个以上的索引。</li>
+<li>unique_subquery：只是用来完全替换子查询的索引查找函数效率更高了。</li>
+<li>index_subquery：区别于unique_subquery，用于非唯一索引，可以返回重复值。</li>
+<li>range：使用索引选择行，仅检索给定范围内的行。简单点说就是针对一个有索引的字段，给定范围检索数据。在where语句中使用 bettween…and、&lt;、&gt;、&lt;=、in 等条件查询 type 都是 range。</li>
+<li>index：Index 与ALL 其实都是读全表，区别在于index是遍历索引树读取，而ALL是从硬盘中读取。</li>
+<li>ALL：将遍历全表以找到匹配的行，性能最差。</li>
+</ul>
+<h3 id="possible-keys"><a href="#possible-keys" class="headerlink" title="possible_keys"></a>possible_keys</h3><p>表示在MySQL中通过哪些索引，能让我们在表中找到想要的记录，一旦查询涉及到的某个字段上存在索引，则索引将被列出，但这个索引<code>并不一定是</code>最终查询数据时所被用到的索引。((<code>有时候，你虽然给相应字段建立了索引，但是优化器并不一定会按这个索引来执行，这时候就需要你以force index来指定</code>))</p>
+<h3 id="key"><a href="#key" class="headerlink" title="key"></a>key</h3><p>区别于possible_keys，<code>key是查询中实际使用到的索引</code>，若没有使用索引，显示为NULL。</p>
+<h3 id="key-len"><a href="#key-len" class="headerlink" title="key_len"></a>key_len</h3><p>key_len：表示查询用到的索引长度（字节数），原则上<code>长度越短越好</code>。</p>
+<p>单列索引就将整个索引长度算进去，多列索引，不是所有列都能用到，需要计算查询中实际用到的列。</p>
+<h3 id="ref"><a href="#ref" class="headerlink" title="ref"></a>ref</h3><p>ref：常见的有：<code>const，func，null，字段名</code>。</p>
+<p>当使用常量等值查询，显示const。当关联查询时，会显示相应关联表的关联字段。如果查询条件使用了表达式、函数，或者条件列发生内部隐式转换，可能显示为func。其他情况都显示为null。</p>
+<h3 id="rows"><a href="#rows" class="headerlink" title="rows"></a>rows</h3><p>rows：以表的统计信息和索引使用情况，估算要找到我们所需的记录，需要读取的行数。</p>
+<p>这是评估SQL性能的一个比较<code>重要的数据</code>，mysql需要扫描的行数，很直观的显示SQL性能的好坏，一般情况下rows值越小越好。</p>
+<h3 id="filtered"><a href="#filtered" class="headerlink" title="filtered"></a>filtered</h3><p>filtered 这个是一个百分比的值。简单点说，这个字段表示存储引擎返回的数据在经过过滤后，剩下满足条件的记录数量的比例。(<code>MySQL.5.7后，默认explain直接显示partitions和filtered的信息</code>)。</p>
+<h3 id="Extra"><a href="#Extra" class="headerlink" title="Extra"></a>Extra</h3><p>这个列会显示很多不适合在其他列中显示的信息，Explain 中的很多额外的信息会在这个字段显示：</p>
+<ul>
+<li>Using index：我们在相应的 select 操作中使用了覆盖索引，通俗一点讲就是查询的列被索引覆盖，使用到覆盖索引查询速度会非常快，SQl优化中理想的状态。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT id FROM s_goods;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://static01.imgkr.com/temp/33c6e1140611401c992d1a8240f3b32f.png" alt="image">image</p>
+<ul>
+<li>Using where：查询时未找到可用的索引，进而通过where条件过滤获取所需数据，但要注意的是并不是所有带where语句的查询都会显示Using where。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT * FROM s_goods WHERE cat_id &#x3D; 1;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://static01.imgkr.com/temp/4c2d847d5358440fa770be3688c78944.png" alt="image">image</p>
+<ul>
+<li>Using temporary：表示查询后结果需要使用临时表来存储，一般在排序或者分组查询时用到。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT shop_id FROM s_goods WHERE cat_id IN (1,2,3,4) GROUP BY shop_id;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://static01.imgkr.com/temp/7859396368ca4a8d96ea37405d4ceba7.png" alt="image">image</p>
+<ul>
+<li>Using filesort:表示无法利用索引完成的排序操作，也就是ORDER BY的字段没有索引，通常这样的SQL都是需要优化的。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT * FROM s_goods ORDER BY shop_id;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://static01.imgkr.com/temp/9a3e3f236f4f45ee85562c33d44ce2ac.png" alt="image">image</p>
+<ul>
+<li>Using join buffer：关联字段没有用到索引的话，会显示这个。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT * FROM s_goods a LEFT JOIN s_goods_cats b ON a.shop_id &#x3D; b.parent_id;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://static01.imgkr.com/temp/943b6863a80a4cdaa775f1e80bad76ed.png" alt="image">image</p>
+<ul>
+<li>Impossible where：表示在我们用不太正确的where语句，导致没有符合条件的行。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT * FROM s_goods WHERE 1 &lt;&gt; 1;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://static01.imgkr.com/temp/6949f4009c99445d913ca992ac885d04.png" alt="image">image</p>
+<ul>
+<li>No tables used：我们的查询语句中没有FROM子句，或者有 FROM DUAL子句。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT NOW();</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://static01.imgkr.com/temp/7d6e1d7c52d649debe9f9d3a774552bc.png" alt="image">image</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">还有一些其他的字段，这里就不再一一列举了，如果有需要可以点击下面链接查看！</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://dev.mysql.com/doc/refman/8.0/en/use.html" target="_blank" rel="noopener">最后附上MYSQL 8.0文献资料地址，有疑问可以点击查询！</a></p>
+<h2 id="鸣谢"><a href="#鸣谢" class="headerlink" title="鸣谢"></a><strong>鸣谢</strong></h2><ul>
+<li><a href="https://time.geekbang.org/column/intro/100020801?utm_source=pinpaizhuanqu&utm_medium=geektime&utm_campaign=guanwang&utm_term=guanwang&utm_content=0511" target="_blank" rel="noopener">林晓斌 MYSQL 实战45讲</a></li>
+<li><a href="https://juejin.im/post/5ec4e4a5e51d45786973b357#heading-41" target="_blank" rel="noopener">不会看 Explain执行计划，劝你简历别写熟悉 SQL优化</a></li>
+</ul>
+<h2 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a><strong>结尾</strong></h2><p><strong>如果你觉得我的文章对你有帮助话，欢迎关注我的微信公众号:”一个快乐又痛苦的程序员”（无广告，单纯分享原创文章、已pj的实用工具、各种Java学习资源，期待与你共同进步)</strong></p>
+<p><img src="https://imgkr.cn-bj.ufileos.com/8e2fc421-3a92-4d2b-bff3-c696f3473bf9.png" alt="img"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/07/%E9%9D%A2%E8%AF%95%E5%BF%85%E9%97%AE%EF%BC%9A%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0/" rel="next" title="面试必问：多线程与线程池">
+                <i class="fa fa-chevron-left"></i> 面试必问：多线程与线程池
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="wanxi" />
+            
+              <p class="site-author-name" itemprop="name">wanxi</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/weiwanx" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/qq_35364594" target="_blank" title="csdn">
+                      
+                        <i class="fa fa-fw fa-crosshairs"></i>csdn</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://juejin.im/user/5ddbaddd6fb9a07aad3827a8/posts" target="_blank" title="掘金">
+                      
+                        <i class="fa fa-fw fa-spinner"></i>掘金</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="weiwanx@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1、吹吹水"><span class="nav-number">1.</span> <span class="nav-text">1、吹吹水</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、基础内容"><span class="nav-number">2.</span> <span class="nav-text">2、基础内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3、Explain执行计划详解"><span class="nav-number">3.</span> <span class="nav-text">3、Explain执行计划详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#id"><span class="nav-number">3.1.</span> <span class="nav-text">id</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#select-type"><span class="nav-number">3.2.</span> <span class="nav-text">select_type</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#table"><span class="nav-number">3.3.</span> <span class="nav-text">table</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#partitions"><span class="nav-number">3.4.</span> <span class="nav-text">partitions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#type"><span class="nav-number">3.5.</span> <span class="nav-text">type</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#possible-keys"><span class="nav-number">3.6.</span> <span class="nav-text">possible_keys</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#key"><span class="nav-number">3.7.</span> <span class="nav-text">key</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#key-len"><span class="nav-number">3.8.</span> <span class="nav-text">key_len</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ref"><span class="nav-number">3.9.</span> <span class="nav-text">ref</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rows"><span class="nav-number">3.10.</span> <span class="nav-text">rows</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#filtered"><span class="nav-number">3.11.</span> <span class="nav-text">filtered</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Extra"><span class="nav-number">3.12.</span> <span class="nav-text">Extra</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#鸣谢"><span class="nav-number">4.</span> <span class="nav-text">鸣谢</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结尾"><span class="nav-number">5.</span> <span class="nav-text">结尾</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wanxi</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
