@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="网络编程," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1、同步、异步、阻塞、非阻塞同步与异步: 同步就是一个任务的完成需要依赖另外一个任务时，只有等待被依赖的任务完成后，依赖的任务才能算完成，这是一种可靠的任务序列。要么成功都成功，失败都失败，两个任务的状态可以保持一致。而异步是不需要等待被依赖的任务完成，只是通知被依赖的任务要完成什么工作，依赖的任务也立即执行，只要自己完成了整个任务就算完成了。至于被依赖的任务最终是否真正完成，依赖它的任务无法确">
+<meta property="og:type" content="article">
+<meta property="og:title" content="你知道Java中的流操作么？">
+<meta property="og:url" content="http://yoursite.com/2020/07/14/%E4%BD%A0%E7%9F%A5%E9%81%93Java%E4%B8%AD%E7%9A%84%E6%B5%81%E6%93%8D%E4%BD%9C%E4%B9%88%EF%BC%9F/index.html">
+<meta property="og:site_name" content="少年肩头">
+<meta property="og:description" content="1、同步、异步、阻塞、非阻塞同步与异步: 同步就是一个任务的完成需要依赖另外一个任务时，只有等待被依赖的任务完成后，依赖的任务才能算完成，这是一种可靠的任务序列。要么成功都成功，失败都失败，两个任务的状态可以保持一致。而异步是不需要等待被依赖的任务完成，只是通知被依赖的任务要完成什么工作，依赖的任务也立即执行，只要自己完成了整个任务就算完成了。至于被依赖的任务最终是否真正完成，依赖它的任务无法确">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/5ca73043-dad6-4777-af11-f229d28975f4.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/0e40582e-2c7f-4f09-9fad-c232fb7af69c.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/948a24d7-bbbe-44ba-bf67-5265260c5273.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/185948b3-a8d8-4732-8138-b350a75eca12.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/11d2738c-a73d-45b9-a289-4c7935d9b292.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/067139b0-af31-44ca-859e-9eb3a0709b48.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/f8907b14-0561-48ba-824d-794d77b1adfe.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/afe0d5b2-1e9f-4b90-8a22-30e546d1dfa8.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/56974ba4-d243-4093-b51a-cdfdc4f1aaa0.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/801268dd-f53e-44ee-9a71-5b02fa4b7b17.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/3ce3e83d-5b90-41bd-ab2b-98ca48f66e73.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/929d1142-681f-492b-bf89-d03c4962aa4b.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/335c31b7-8930-4cab-a5cf-6154e2c83208.png">
+<meta property="og:image" content="https://imgkr.cn-bj.ufileos.com/8e2fc421-3a92-4d2b-bff3-c696f3473bf9.png">
+<meta property="article:published_time" content="2020-07-14T03:08:21.000Z">
+<meta property="article:modified_time" content="2020-07-14T03:09:49.831Z">
+<meta property="article:author" content="wanxi">
+<meta property="article:tag" content="网络编程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://imgkr.cn-bj.ufileos.com/5ca73043-dad6-4777-af11-f229d28975f4.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/07/14/你知道Java中的流操作么？/"/>
+
+
+
+
+
+  <title>你知道Java中的流操作么？ | 少年肩头</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/weiwanx" target="_blank" rel="noopener" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">少年肩头</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/07/14/%E4%BD%A0%E7%9F%A5%E9%81%93Java%E4%B8%AD%E7%9A%84%E6%B5%81%E6%93%8D%E4%BD%9C%E4%B9%88%EF%BC%9F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wanxi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="少年肩头">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">你知道Java中的流操作么？</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-14T11:08:21+08:00">
+                2020-07-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://imgkr.cn-bj.ufileos.com/5ca73043-dad6-4777-af11-f229d28975f4.png" alt="怎样都要生活，不如上进一些"></p>
+<h2 id="1、同步、异步、阻塞、非阻塞"><a href="#1、同步、异步、阻塞、非阻塞" class="headerlink" title="1、同步、异步、阻塞、非阻塞"></a><strong>1、同步、异步、阻塞、非阻塞</strong></h2><p><code>同步与异步:</code> 同步就是一个任务的完成需要依赖另外一个任务时，只有等待被依赖的任务完成后，依赖的任务才能算完成，这是一种可靠的任务序列。要么成功都成功，失败都失败，两个任务的状态可以保持一致。而异步是不需要等待被依赖的任务完成，只是通知被依赖的任务要完成什么工作，依赖的任务也立即执行，只要自己完成了整个任务就算完成了。至于被依赖的任务最终是否真正完成，依赖它的任务无法确定，所以它是不可靠的任务序列。我们可以用打电话和发短信来很好的比喻同步与异步操作。</p>
+<p><code>阻塞与非阻塞:</code> 阻塞与非阻塞主要是从 CPU 的消耗上来说的，阻塞就是 CPU 停下来等待一个慢的操作完成 CPU 才接着完成其它的事。非阻塞就是在这个慢的操作在执行时 CPU 去干其它别的事，等这个慢的操作完成时，CPU 再接着完成后续的操作。虽然表面上看非阻塞的方式可以明显的提高 CPU 的利用率，但是也带了另外一种后果就是系统的线程切换增加。增加的 CPU 使用时间能不能补偿系统的切换成本需要好好评估。</p>
+<h2 id="2、BIO"><a href="#2、BIO" class="headerlink" title="2、BIO"></a><strong>2、BIO</strong></h2><p>BIO，一般称之为阻塞(block)IO、基本(basic)IO。就是传统的java.io包，它是基于流模型实现的，交互的方式是同步、阻塞方式，主要应用于文件IO和网络IO。</p>
+<p>文件IO就是 <code>InputStream、OutputStream</code> 基于字节操作的 IO、<code>Writer、Reader</code> 基于字符操作的 IO，网络IO就是 <code>Socket</code> 基于网络操作的 IO。文件IO就是读写操作，就不记录了，这里记录一下网络IO吧。</p>
+<p>在JDK1.4之前，建议网络连接的时候只能采用BIO，需要先在服务端启动一个ServerSocket，然后在客户端启动ocket来对服务端进行通信。默认情况下服务端需要对每个请求建立一堆线程等待请求，而客户端发送请求后，会先咨询服务端是否有线程响应，如果没有则会一直等待或者遭到拒绝请求，如果有的话客户端线程会等待请求结束后才继续执行，这就是阻塞IO。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">服务端代码：</span><br><span class="line">&#x2F;**</span><br><span class="line"> * 服务端</span><br><span class="line"> *&#x2F;</span><br><span class="line">public class BioServer &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws Exception&#123;</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; 创建ServerSocket对象,绑定端口：9000</span><br><span class="line">        ServerSocket serverSocket &#x3D; new ServerSocket(9000);</span><br><span class="line"></span><br><span class="line">        for (;;)&#123;</span><br><span class="line">            System.out.println(&quot;1&quot;);</span><br><span class="line">            &#x2F;&#x2F; 监听客户端程序,看是否有客户端来连接、发消息等(阻塞方式，如果客户端没有连接，会一直阻塞在这里，不会往下执行)</span><br><span class="line">            Socket accept &#x3D; serverSocket.accept();</span><br><span class="line">            System.out.println(&quot;2&quot;);</span><br><span class="line">            &#x2F;&#x2F; 从连接中取出输入流来接收消息</span><br><span class="line">            InputStream inputStream &#x3D; accept.getInputStream();</span><br><span class="line">            byte[] bytes &#x3D; new byte[10];</span><br><span class="line">            inputStream.read(bytes);</span><br><span class="line">            &#x2F;&#x2F; 打印接收到的消息</span><br><span class="line">            System.out.println(&quot;对方说&quot; + new String(bytes));</span><br><span class="line">            &#x2F;&#x2F; 回答消息</span><br><span class="line">            OutputStream outputStream &#x3D; accept.getOutputStream();</span><br><span class="line">            System.out.println(&quot;请输入：&quot;);</span><br><span class="line">            Scanner scanner &#x3D; new Scanner(System.in);</span><br><span class="line">            String data &#x3D; scanner.nextLine();</span><br><span class="line">            outputStream.write(data.getBytes());</span><br><span class="line">            &#x2F;&#x2F; 关闭</span><br><span class="line">&#x2F;&#x2F;            serverSocket.close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">客户端代码：</span><br><span class="line">&#x2F;**</span><br><span class="line"> * 客户端</span><br><span class="line"> *&#x2F;</span><br><span class="line">public class BioClient &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws Exception&#123;</span><br><span class="line"></span><br><span class="line">        for (;;)&#123;</span><br><span class="line">            &#x2F;&#x2F; 创建Socket对象</span><br><span class="line">            Socket socket &#x3D; new Socket(&quot;127.0.0.1&quot;, 9000);</span><br><span class="line">            &#x2F;&#x2F; 从连接中取出输出流并发送消息</span><br><span class="line">            OutputStream outputStream &#x3D; socket.getOutputStream();</span><br><span class="line">            System.out.println(&quot;请输入：&quot;);</span><br><span class="line">            Scanner scanner &#x3D; new Scanner(System.in);</span><br><span class="line">            String data &#x3D; scanner.nextLine();</span><br><span class="line">            outputStream.write(data.getBytes());</span><br><span class="line">            System.out.println(&quot;3&quot;);</span><br><span class="line">            &#x2F;&#x2F; 从连接中取出输入流接收并回答（这里也是阻塞，如果没有接收到对方回复的消息，这里会一直阻塞下去）</span><br><span class="line">            InputStream inputStream &#x3D; socket.getInputStream();</span><br><span class="line">            byte[] bytes &#x3D; new byte[10];</span><br><span class="line">            inputStream.read(bytes);</span><br><span class="line">            System.out.println(&quot;4&quot;);</span><br><span class="line">            System.out.println(&quot;对方说：&quot; + new String(bytes).trim());</span><br><span class="line">            &#x2F;&#x2F; 关闭</span><br><span class="line">&#x2F;&#x2F;            socket.close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>1、首先启动服务端，控制台只打印了1，并没有继续往下执行： <img src="https://imgkr.cn-bj.ufileos.com/0e40582e-2c7f-4f09-9fad-c232fb7af69c.png" alt="image"></li>
+<li>2、启动客户端，输入aaa，如下图，服务端控制台继续执行了下去，但是可以看到客户端也阻塞了，控制台只打印了3： <img src="https://imgkr.cn-bj.ufileos.com/948a24d7-bbbe-44ba-bf67-5265260c5273.png" alt="image"> <img src="https://imgkr.cn-bj.ufileos.com/185948b3-a8d8-4732-8138-b350a75eca12.png" alt="image"></li>
+<li>3、服务端回复bbb，客户端打印出4并循环执行： <img src="https://imgkr.cn-bj.ufileos.com/11d2738c-a73d-45b9-a289-4c7935d9b292.png" alt="image"></li>
+</ul>
+<blockquote>
+<p>BIO 就是传统的 java.io 包，它是基于流模型实现的，交互的方式是同步、阻塞方式，也就是说在读入输入流或者输出流时，在读写动作完成之前，线程会一直阻塞在那里，它们之间的调用时可靠的线性顺序。它的有点就是代码比较简单、直观；缺点就是 IO 的效率和扩展性很低，容易成为应用性能瓶颈。</p>
+</blockquote>
+<h2 id="3、NIO"><a href="#3、NIO" class="headerlink" title="3、NIO"></a><strong>3、NIO</strong></h2><p>NIO，一般称之为新(new)IO、非阻塞(non-blocking)IO。就是java.nio包，是从<code>JDK1.4开始</code>提供的新api，Java提供了一系列改进的输入/输出的新特性，统称为NIO。新增了许多用于处理输入输出的类，这些类都被放在java.nio包及子包下，并且对原java.io包中很多类进行改写，新增了满足NIO的功能，交互的方式是同步、非阻塞方式。</p>
+<p>NIO和BIO有相同的目的和作用，但是他们的实现方式完全不同，BIO是以<code>流</code>的方式处理数据，而NIO是以<code>块</code>的方式处理数据，块IO的效率要比流IO高很多。另外，<code>NIO是非阻塞式</code>的，这一点也和BIO很不相同，使用NIO可以提供非阻塞式的高伸缩性网络。</p>
+<table>
+<thead>
+<tr>
+<th align="center">类型</th>
+<th align="center">输出方式</th>
+<th align="center">缓冲区</th>
+<th align="center">交互方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">BIO</td>
+<td align="center">流</td>
+<td align="center">数组(byte[])</td>
+<td align="center">同步、阻塞</td>
+</tr>
+<tr>
+<td align="center">NIO</td>
+<td align="center">Channel(通道)</td>
+<td align="center">Buffer</td>
+<td align="center">同步、非阻塞（也可以是阻塞的，但没必要）</td>
+</tr>
+</tbody></table>
+<p>NIO主要有三大核心部分：Channel(通道)、Buffer(缓冲区)、Selector(选择器)。<code>传统的BIO是基于字节流和字符流进行操作</code>，<code>而NIO基于Channel和Buffer进行操作</code>，数据总是从通道读取到缓冲区，或者从缓冲区写入通道中。Selector(选择器)用于监听多个通道的事件(比如：连接打开、数据到达)。因此使用单个线程就可以监听多个数据通道。</p>
+<p>前面说了NIO和BIO有相同的目的和作用，那么NIO的主要应用也是文件IO和网络IO。下面先解释一下NIO的核心部分概述和API，然后通过代码来看一下。</p>
+<p><code>缓冲区(Buffer):</code>实际上是一个容器，是一个特殊的数组，缓冲区对象内置了一些机制，能够跟踪和记录缓冲区的状态变化情况。Channel提供从文件、网络读取数据的渠道，但是读取或写入的数据都必须经由Buffer。 <img src="https://imgkr.cn-bj.ufileos.com/067139b0-af31-44ca-859e-9eb3a0709b48.png" alt="image"> 在NIO中，Buffer是一个顶层父类，它也是一个抽象类，常用的有以下子类： <img src="https://imgkr.cn-bj.ufileos.com/f8907b14-0561-48ba-824d-794d77b1adfe.png" alt="image"> 对于Java中的基本数据类型，都有一个具体的Buffer类型与之对应，最常用的自然是ByteBuffer类(二进制数据)，该类的主要方法有以下几个：</p>
+<ul>
+<li>public abstract ByteBuffer put(byte b):存储字节数据到缓冲区。</li>
+<li>public abstract byte get():从缓冲区获得字节数据。</li>
+<li>public final byte[] array():把缓冲区数据转换成字节数组。</li>
+<li>public static ByteBuffer allocate(int capacity):设置缓冲区初识容量。</li>
+<li>piblic static ByteBuffer wrap(byte[] array):把一个线程的数组放到缓冲区中使用。</li>
+<li>public final Buffer flip():反转缓冲区，充值位置到初始位置。</li>
+</ul>
+<p><code>通道(Channel):</code>类似于BIO中的stream，用来建立到目标的一个连接，<code>但是需要注意</code>：BIO中的stream是单向的，例如FileInputStream对象只能进行读取数据的操作，而NIO中的通道是双向的，既可以用来进行读操作，也可以用来进行写操作。常用的Channel类有：FileChannel、DatagramChannel、ServerSocketChannel、SocketChannel。FileChannel用于文件的数据读写，DatagramChannel用于UDP的数据读写，ServerSocketChannel和SocketChannel用于TCP的数据读写。</p>
+<p>FileChannel常用方法：</p>
+<ul>
+<li>public int read(ByteBuffer dst):读取数据并放到缓冲区中。</li>
+<li>public int write(ByteBuffer src):把缓冲区的数据写到通道中。</li>
+<li>public long transferFrom(ReadableByteChannel src, long position, long count):从目标通道中复制数据。</li>
+<li>public long transferTo(long position, long count, WritableByteChannel target):把数据从当前通道复制给目标通道。</li>
+</ul>
+<p>示例：通过NIO往本地文件中写数据：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class NioWrite &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws Exception&#123;</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; 创建输出流</span><br><span class="line">        FileOutputStream fileOutputStream &#x3D; new FileOutputStream(&quot;test.txe&quot;);</span><br><span class="line">        &#x2F;&#x2F; 从流中得到一个通道</span><br><span class="line">        FileChannel channel &#x3D; fileOutputStream.getChannel();</span><br><span class="line">        &#x2F;&#x2F; 提供一个缓冲区</span><br><span class="line">        ByteBuffer allocate &#x3D; ByteBuffer.allocate(1024);</span><br><span class="line">        &#x2F;&#x2F; 往缓冲区存入数据</span><br><span class="line">        String string &#x3D; &quot;我是要输入的数据&quot;;</span><br><span class="line">        allocate.put(string.getBytes());</span><br><span class="line">        &#x2F;&#x2F; 翻转缓冲区，将位置设为初始位置</span><br><span class="line">        allocate.flip();</span><br><span class="line">        &#x2F;&#x2F; 把缓冲区写到通道中</span><br><span class="line">        channel.write(allocate);</span><br><span class="line">        &#x2F;&#x2F; 关闭</span><br><span class="line">        fileOutputStream.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://imgkr.cn-bj.ufileos.com/afe0d5b2-1e9f-4b90-8a22-30e546d1dfa8.png" alt="image"> 可以看到上面代码有个翻转缓冲区的代码，当你把这一行代码去掉之后你会发现，test.txe文件内显示的内容是空的，这是为啥呢？</p>
+<p>原因看下图： <img src="https://imgkr.cn-bj.ufileos.com/56974ba4-d243-4093-b51a-cdfdc4f1aaa0.png" alt="image"> 缓冲区存数据就是从头然后到尾，而1和2表示的就是指针位置，当我们把<code>我是要输入的数据</code>这一段话存到缓冲区中的时候，指针就到了2的位置，然后开始往通道写数据，实际上就是从2的位置开始往下写，而下面内容明显是空的，所以test.txe文件内显示的内容是空的，而缓冲区的flip()方法，就是将指针从2翻转到初始位置，也就是1的位置，再往通道写数据，这时候就有了内容。</p>
+<p>示例：通过NIO从本地文件中读取数据：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public class NioRead &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws Exception&#123;</span><br><span class="line"></span><br><span class="line">        File file &#x3D; new File(&quot;test.txe&quot;);</span><br><span class="line">        &#x2F;&#x2F; 创建输入流</span><br><span class="line">        FileInputStream fileInputStream &#x3D; new FileInputStream(file);</span><br><span class="line">        &#x2F;&#x2F; 得到一个通道</span><br><span class="line">        FileChannel channel &#x3D; fileInputStream.getChannel();</span><br><span class="line">        &#x2F;&#x2F; 准备一个缓冲区</span><br><span class="line">        ByteBuffer allocate &#x3D; ByteBuffer.allocate((int) file.length());</span><br><span class="line">        &#x2F;&#x2F; 从通道里读取数据并存到缓冲区</span><br><span class="line">        channel.read(allocate);</span><br><span class="line">        &#x2F;&#x2F; 打印数据</span><br><span class="line">        System.out.println(new String(allocate.array()));</span><br><span class="line">        &#x2F;&#x2F; 关闭</span><br><span class="line">        fileInputStream.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://imgkr.cn-bj.ufileos.com/801268dd-f53e-44ee-9a71-5b02fa4b7b17.png" alt="image">image</p>
+<p><code>选择器(Selector):</code>选择器，能够检测多个注册的通道上是否有时间发生，如果有时间发生，便获取事件然后针对每个事件进行相应的响应处理。这样就可以只用一个单线程去管理多个通道，也就是管理多个连接。这样使得只有在连接真正的读写事件发生时，才会调用函数来进行读写，就<code>大大的减少了系统开销</code>，并且不必为每个连接都创建一个线程，不用去维护多个线程，并且避免了多线程之间的上下文切换导致的开销。 <img src="https://imgkr.cn-bj.ufileos.com/3ce3e83d-5b90-41bd-ab2b-98ca48f66e73.png" alt="image"> <code>常用方法</code>：</p>
+<ul>
+<li>public static Selector open():得到一个选择器对象。</li>
+<li>public int select(long timeout):监控所有注册的channel，当其中有注册的IO操作可以进行时，将对应的SelectionKey加入到内部集合中并返回，参数用来设置超时时间。</li>
+<li>public Set SelectionKeys():从内部集合中得到所有的SelectionKey。</li>
+</ul>
+<p>2、<code>SelectionKey</code>:代表了Selector和serverSocketChannel的注册关系，一共四种：</p>
+<ul>
+<li>int OP_ACCEPT:有新的网络连接可以accept，值为16。</li>
+<li>int OP_CONNECT:代表连接已经建立，值为8。</li>
+<li>int OP_READ和int OP_WRITE:代表了读、写操作，值为1和4。</li>
+</ul>
+<p><code>常用方法</code>：</p>
+<ul>
+<li>public abstract Selector selector():得到与之关联的Selector对象。</li>
+<li>public abstract SelectableChannel channel():得到与之关联的通道。</li>
+<li>public final Object attachment():得到与之关联的共享数据。</li>
+<li>public abstract SelectionKey interestOps(int ops):设置或改变监听事件。</li>
+<li>public final boolean isAccepyable():是否可以accept。</li>
+<li>public final boolean isReadable():是否可以读。</li>
+<li>public final boolean isWritable():是否可以写。</li>
+</ul>
+<p>3、<code>ServerSocketChannel</code>:用来在服务器端监听新的客户端Socket连接。</p>
+<p><code>常用方法</code>：</p>
+<ul>
+<li>public static ServerSocketChannel open():得到一个ServerSocketChannel通道。</li>
+<li>public final ServerSocketChannel bind(SocketAddress local):设置服务器端口号。</li>
+<li>public final SelectableChannel configureBlocking(boolean block):设置阻塞或非阻塞模式，取值false表示采用非阻塞模式。</li>
+<li>public Socketchannel accept():接收一个连接，返回代表这个连接的通道对象。</li>
+<li>public final SelectionKey register(Selector sel, int ops):注册一个选择器并设置监听事件。</li>
+</ul>
+<p>4、<code>SocketChannel</code>:网络IO通道，具体负责进行读写操作。NIO总是把缓冲区的数据写入通道，或者把通道里的数据读出到缓冲区。</p>
+<p><code>常用方法</code>：</p>
+<ul>
+<li>public static SocketChannel open():得到一个SocketChannel通道。</li>
+<li>public final SelectableChannel configureBlocking(boolean block):设置阻塞或非阻塞模式，取值false表示采用非阻塞模式。</li>
+<li>public boolean connect(SocketAddress remote):连接服务器。</li>
+<li>public boolean finishConnect():如果上面的方法连接失败了，接下来就要通过该方法完成连接操作。</li>
+<li>public int write(ByteBuffer src):往通道写数据。</li>
+<li>public int read(ByteBuffer dst):从通道读数据。</li>
+<li>public final SelectionKey register(Selector sel, int ops, Object att):注册一个选择器并设置监听时间，最后一个参数可以设置共享数据。</li>
+<li>public final void close():关闭通道。</li>
+</ul>
+<p>示例：NIO实现服务器端和客户端之间的数据通信(非阻塞、基础版):</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line">客户端代码:</span><br><span class="line">public class NioClient &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws Exception&#123;</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; 得到一个网络通道</span><br><span class="line">        SocketChannel socketChannel &#x3D; SocketChannel.open();</span><br><span class="line">        &#x2F;&#x2F; 设置非阻塞模式</span><br><span class="line">        socketChannel.configureBlocking(false);</span><br><span class="line">        &#x2F;&#x2F; 提供服务器端的ip地址和端口号</span><br><span class="line">        InetSocketAddress inetSocketAddress &#x3D; new InetSocketAddress(&quot;127.0.0.1&quot;, 9001);</span><br><span class="line">        &#x2F;&#x2F; 连接服务器</span><br><span class="line">        if (!socketChannel.connect(inetSocketAddress)) &#123;</span><br><span class="line">            &#x2F;&#x2F; 循环-直到某一时刻连接到(在连接的时候可以做别的事情，比如下面打印数据，这就是NIO的优势)</span><br><span class="line">            while (!socketChannel.finishConnect())&#123;</span><br><span class="line">                System.out.println(&quot;还没有连接到。。。&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(&quot;连接到了。。。&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        &#x2F;&#x2F; 得到一个缓冲区并存入数据</span><br><span class="line">        String string &#x3D; &quot;NIO测试，我是客户端传的数据&quot;;</span><br><span class="line">        ByteBuffer writeBuffer &#x3D; ByteBuffer.wrap(string.getBytes());</span><br><span class="line">        &#x2F;&#x2F; 发送数据</span><br><span class="line">        socketChannel.write(writeBuffer);</span><br><span class="line">        &#x2F;&#x2F; 这里关闭通道，服务器端会报异常，所以这里就先设置阻塞</span><br><span class="line">        System.in.read();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">服务器端代码:</span><br><span class="line">public class NioServer &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws Exception&#123;</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; 得到一个ServerSocketChannel对象</span><br><span class="line">        ServerSocketChannel serverSocketChannel &#x3D; ServerSocketChannel.open();</span><br><span class="line">        &#x2F;&#x2F; 得到一个Selector对象</span><br><span class="line">        Selector selector &#x3D; Selector.open();</span><br><span class="line">        &#x2F;&#x2F; 绑定一个端口号</span><br><span class="line">        serverSocketChannel.bind(new InetSocketAddress(9001));</span><br><span class="line">        &#x2F;&#x2F; 设置非阻塞式</span><br><span class="line">        serverSocketChannel.configureBlocking(false);</span><br><span class="line">        &#x2F;&#x2F; 把ServerSocketChannel对象注册给Selector对象</span><br><span class="line">        serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);</span><br><span class="line">        &#x2F;&#x2F; 做事</span><br><span class="line">        for (;;)&#123;</span><br><span class="line">            &#x2F;&#x2F; 监控客户端</span><br><span class="line">            if (selector.select(2000) &#x3D;&#x3D; 0)&#123;</span><br><span class="line">                System.out.println(&quot;没有客户端连接我，我可以干别的事情&quot;);</span><br><span class="line">                continue;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            &#x2F;&#x2F; 得到SelectionKey，判断通道里的事件</span><br><span class="line">            Iterator&lt;SelectionKey&gt; iterator &#x3D; selector.selectedKeys().iterator();</span><br><span class="line">            while (iterator.hasNext())&#123;</span><br><span class="line">                SelectionKey key &#x3D; iterator.next();</span><br><span class="line"></span><br><span class="line">                &#x2F;&#x2F; 如果是客户端连接事件</span><br><span class="line">                if (key.isAcceptable())&#123;</span><br><span class="line">                    System.out.println(&quot;连接事件&quot;);</span><br><span class="line">                    &#x2F;&#x2F; 接收连接</span><br><span class="line">                    SocketChannel socketChannel &#x3D; serverSocketChannel.accept();</span><br><span class="line">                    &#x2F;&#x2F; 设置非阻塞式</span><br><span class="line">                    socketChannel.configureBlocking(false);</span><br><span class="line">                    &#x2F;&#x2F; 注册</span><br><span class="line">                    socketChannel.register(selector, SelectionKey.OP_READ, ByteBuffer.allocate(1024));</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                &#x2F;&#x2F; 读取客户端数据事件</span><br><span class="line">                if (key.isReadable())&#123;</span><br><span class="line">                    SocketChannel channel &#x3D; (SocketChannel) key.channel();</span><br><span class="line">                    ByteBuffer buffer &#x3D; (ByteBuffer) key.attachment();</span><br><span class="line">                    channel.read(buffer);</span><br><span class="line">                    System.out.println(&quot;客户端发来数据：&quot; + new String(buffer.array()));</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                &#x2F;&#x2F; 手动从集合中移除当前key，防止重复处理</span><br><span class="line">                iterator.remove();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>1、先启动服务端，看到下图内容，没有客户端连接的时候，NIO可以做别的事情，而不像BIO阻塞在那里，这就是NIO的优势。 <img src="https://imgkr.cn-bj.ufileos.com/929d1142-681f-492b-bf89-d03c4962aa4b.png" alt="image"> 2、启动客户端程序，服务端控制台可以看到下图内容，服务端接收到了客户端发送来的数据。(<code>先连接，才能读写数据，所以最开始发生的事件一定是连接事件，连接成功才会有读写事件</code>) <img src="https://imgkr.cn-bj.ufileos.com/335c31b7-8930-4cab-a5cf-6154e2c83208.png" alt="image"></p>
+<blockquote>
+<p>先写到这里吧，都是些基础的内容，之后的文章会写比较复杂的NIO案例、Netty框架等！</p>
+</blockquote>
+<h2 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a><strong>结尾</strong></h2><p><strong>如果你觉得我的文章对你有帮助话，欢迎关注我的微信公众号:”一个快乐又痛苦的程序员”（无广告，单纯分享原创文章、已pj的实用工具、各种Java学习资源，期待与你共同进步)</strong></p>
+<p><img src="https://imgkr.cn-bj.ufileos.com/8e2fc421-3a92-4d2b-bff3-c696f3473bf9.png" alt="img"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" rel="tag"># 网络编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/21/SQL%E4%BC%98%E5%8C%96%E5%A6%82%E4%BD%95%E6%89%8D%E8%83%BDhold%E4%BD%8F/" rel="next" title="SQL优化如何才能hold住">
+                <i class="fa fa-chevron-left"></i> SQL优化如何才能hold住
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="wanxi" />
+            
+              <p class="site-author-name" itemprop="name">wanxi</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/weiwanx" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/qq_35364594" target="_blank" title="csdn">
+                      
+                        <i class="fa fa-fw fa-crosshairs"></i>csdn</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://juejin.im/user/5ddbaddd6fb9a07aad3827a8/posts" target="_blank" title="掘金">
+                      
+                        <i class="fa fa-fw fa-spinner"></i>掘金</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="weiwanx@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1、同步、异步、阻塞、非阻塞"><span class="nav-number">1.</span> <span class="nav-text">1、同步、异步、阻塞、非阻塞</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、BIO"><span class="nav-number">2.</span> <span class="nav-text">2、BIO</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3、NIO"><span class="nav-number">3.</span> <span class="nav-text">3、NIO</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结尾"><span class="nav-number">4.</span> <span class="nav-text">结尾</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wanxi</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
